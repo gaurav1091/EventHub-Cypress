@@ -48,6 +48,9 @@ Cypress.Commands.add("cleanupTestData", () => {
   const client = new EventHubClient();
 
   return client.login().then(() => {
-    return client.cleanupBookingsByCustomerPrefix().then(() => client.cleanupEventsByTitlePrefix());
+    return client
+      .cleanupRegisteredTestData()
+      .then(() => client.cleanupBookingsByCustomerPrefix())
+      .then(() => client.cleanupEventsByTitlePrefix());
   });
 });

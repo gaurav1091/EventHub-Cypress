@@ -30,7 +30,25 @@ export default class EventHubClient {
   }
 
   createEvent(event) {
-    return this.adminEvents.createEvent(event);
+    return this.adminEvents.createEvent(event).then((response) => {
+      const createdEvent = response.body.data;
+
+      if (!createdEvent?.id) {
+        return response;
+      }
+
+      return cy
+        .task(
+          "registerTestData",
+          {
+            type: "events",
+            id: createdEvent.id,
+            label: createdEvent.title,
+          },
+          { log: false },
+        )
+        .then(() => response);
+    });
   }
 
   deleteEvent(eventId) {
@@ -42,7 +60,25 @@ export default class EventHubClient {
   }
 
   createBooking(booking) {
-    return this.bookings.createBooking(booking);
+    return this.bookings.createBooking(booking).then((response) => {
+      const createdBooking = response.body.data;
+
+      if (!createdBooking?.id) {
+        return response;
+      }
+
+      return cy
+        .task(
+          "registerTestData",
+          {
+            type: "bookings",
+            id: createdBooking.id,
+            label: createdBooking.bookingRef || createdBooking.customerName,
+          },
+          { log: false },
+        )
+        .then(() => response);
+    });
   }
 
   deleteBooking(bookingId) {
@@ -72,6 +108,25 @@ export default class EventHubClient {
       return cy.wrap(matchingEvents, { log: false }).each((event) => {
         this.deleteEvent(event.id).its("status").should("be.oneOf", [200, 404]);
       });
+    });
+  }
+
+  cleanupRegisteredTestData() {
+    return cy.task("getTestDataRegistry", null, { log: false }).then((registry) => {
+      const bookings = registry.bookings || [];
+      const events = registry.events || [];
+
+      return cy
+        .wrap(bookings, { log: false })
+        .each((booking) => {
+          this.deleteBooking(booking.id).its("status").should("be.oneOf", [200, 404]);
+        })
+        .then(() =>
+          cy.wrap(events, { log: false }).each((event) => {
+            this.deleteEvent(event.id).its("status").should("be.oneOf", [200, 404]);
+          }),
+        )
+        .then(() => cy.task("clearTestDataRegistry", null, { log: false }));
     });
   }
 

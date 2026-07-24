@@ -1,4 +1,6 @@
 const dotenv = require("dotenv");
+const fs = require("fs");
+const path = require("path");
 const environments = require("../config/environments.json");
 
 dotenv.config();
@@ -15,6 +17,7 @@ const email = process.env.EVENTHUB_USER_EMAIL;
 const password = process.env.EVENTHUB_USER_PASSWORD;
 const bookingPrefix = process.env.EVENTHUB_BOOKING_CLEANUP_PREFIX || "Cypress User";
 const eventPrefix = process.env.EVENTHUB_EVENT_CLEANUP_PREFIX || "Cypress";
+const registryPath = path.join(__dirname, "..", "reports", "test-data-registry.json");
 
 if (!email || !password) {
   throw new Error("Missing EVENTHUB_USER_EMAIL or EVENTHUB_USER_PASSWORD.");
@@ -62,6 +65,51 @@ async function authenticatedRequest(token, path, options = {}) {
   });
 }
 
+function createEmptyRegistry() {
+  return {
+    bookings: [],
+    events: [],
+  };
+}
+
+function readRegistry() {
+  if (!fs.existsSync(registryPath)) {
+    return createEmptyRegistry();
+  }
+
+  return {
+    ...createEmptyRegistry(),
+    ...JSON.parse(fs.readFileSync(registryPath, "utf8")),
+  };
+}
+
+function clearRegistry() {
+  fs.mkdirSync(path.dirname(registryPath), { recursive: true });
+  fs.writeFileSync(registryPath, `${JSON.stringify(createEmptyRegistry(), null, 2)}\n`);
+}
+
+async function cleanupRegisteredBookings(token, bookings) {
+  for (const booking of bookings) {
+    await authenticatedRequest(token, `/api/bookings/${booking.id}`, {
+      method: "DELETE",
+      failOnStatusCode: false,
+    });
+  }
+
+  return bookings.length;
+}
+
+async function cleanupRegisteredEvents(token, events) {
+  for (const event of events) {
+    await authenticatedRequest(token, `/api/events/${event.id}`, {
+      method: "DELETE",
+      failOnStatusCode: false,
+    });
+  }
+
+  return events.length;
+}
+
 async function cleanupBookings(token) {
   const response = await authenticatedRequest(token, "/api/bookings?limit=100");
   const bookings = response.body.data || [];
@@ -98,11 +146,21 @@ async function cleanupEvents(token) {
 
 async function main() {
   const token = await login();
+  const registry = readRegistry();
+  const registeredBookingCount = await cleanupRegisteredBookings(token, registry.bookings);
+  const registeredEventCount = await cleanupRegisteredEvents(token, registry.events);
   const bookingCount = await cleanupBookings(token);
   const eventCount = await cleanupEvents(token);
+  clearRegistry();
 
   console.log(
-    `Cleanup complete for ${environmentName}: ${bookingCount} bookings, ${eventCount} events removed.`,
+    [
+      `Cleanup complete for ${environmentName}:`,
+      `${registeredBookingCount} registered bookings`,
+      `${registeredEventCount} registered events`,
+      `${bookingCount} prefix bookings`,
+      `${eventCount} prefix events removed.`,
+    ].join(" "),
   );
 }
 

@@ -19,28 +19,30 @@ EVENTHUB_USER_PASSWORD=your_password
 
 ## Run Tests
 
-| Command                    | Scope                      | Typical use                                       |
-| -------------------------- | -------------------------- | ------------------------------------------------- |
-| `npm run cy:open`          | Interactive Cypress runner | Local debugging and authoring                     |
-| `npm run cy:run`           | All feature specs          | Full local execution                              |
-| `npm run test:smoke`       | `@smoke` scenarios         | Pull request and quick confidence run             |
-| `npm run test:regression`  | `@regression` scenarios    | Broader functional regression                     |
-| `npm run test:auth`        | Auth feature specs         | Login and route-guard checks                      |
-| `npm run test:events`      | Events feature specs       | Discovery, search, and filtering checks           |
-| `npm run test:bookings`    | Booking feature specs      | Booking lifecycle and validation checks           |
-| `npm run test:admin`       | Admin feature specs        | Event management checks                           |
-| `npm run test:api`         | API feature specs          | API smoke and support-client checks               |
-| `npm run test:hybrid`      | Hybrid feature specs       | API-created data verified through the UI          |
-| `npm run test:a11y`        | Accessibility specs        | Axe serious/critical accessibility smoke          |
-| `npm run test:qa:smoke`    | QA `@smoke` scenarios      | Explicit QA profile smoke run                     |
-| `npm run test:stage:smoke` | Stage `@smoke` scenarios   | Future stage profile smoke run                    |
-| `npm run test:prod-smoke`  | `@smoke and not @stateful` | Future production-safe smoke run                  |
-| `npm run report:html`      | Cucumber messages to HTML  | Generates `reports/cucumber/cucumber-report.html` |
+| Command                    | Scope                      | Typical use                                        |
+| -------------------------- | -------------------------- | -------------------------------------------------- |
+| `npm run cy:open`          | Interactive Cypress runner | Local debugging and authoring                      |
+| `npm run cy:run`           | All feature specs          | Full local execution                               |
+| `npm run doctor`           | Framework health checks    | Validates Node, Cypress, profile, credentials, API |
+| `npm run test:smoke`       | `@smoke` scenarios         | Pull request and quick confidence run              |
+| `npm run test:regression`  | `@regression` scenarios    | Broader functional regression                      |
+| `npm run test:auth`        | Auth feature specs         | Login and route-guard checks                       |
+| `npm run test:events`      | Events feature specs       | Discovery, search, and filtering checks            |
+| `npm run test:bookings`    | Booking feature specs      | Booking lifecycle and validation checks            |
+| `npm run test:admin`       | Admin feature specs        | Event management checks                            |
+| `npm run test:api`         | API feature specs          | API smoke and support-client checks                |
+| `npm run test:hybrid`      | Hybrid feature specs       | API-created data verified through the UI           |
+| `npm run test:a11y`        | Accessibility specs        | Axe serious/critical accessibility smoke           |
+| `npm run test:visual`      | Visual smoke specs         | Captures baseline screenshots for core pages       |
+| `npm run test:qa:smoke`    | QA `@smoke` scenarios      | Explicit QA profile smoke run                      |
+| `npm run test:stage:smoke` | Stage `@smoke` scenarios   | Future stage profile smoke run                     |
+| `npm run test:prod-smoke`  | `@smoke and not @stateful` | Future production-safe smoke run                   |
+| `npm run report:html`      | Cucumber messages to HTML  | Generates `reports/cucumber/cucumber-report.html`  |
 
 Current verified suites:
 
 - Smoke: 8 passing scenarios across Auth, Events, Bookings, Admin, and API.
-- Regression: 18 passing UI scenarios across Auth, Events, Bookings, and Admin.
+- Regression: 33 passing scenarios across Auth, Events, Bookings, Admin, API, Hybrid, and Accessibility.
 
 The npm scripts intentionally unset `ELECTRON_RUN_AS_NODE` because that variable makes Cypress's
 Electron runner launch incorrectly on this machine.
@@ -74,8 +76,9 @@ EVENTHUB_USER_PASSWORD
 ## Cleanup Strategy
 
 State-changing scenarios are tagged with `@stateful`. The framework runs API cleanup before and after
-each `@stateful` scenario, removing generated bookings and user-created admin events by their Cypress
-test-data prefixes.
+each `@stateful` scenario. Data created through the API client is registered in
+`reports/test-data-registry.json` and removed by exact ID first. Prefix cleanup then runs as a fallback
+for any state that was created before registration or left behind by an interrupted run.
 
 Current generated data prefixes:
 
@@ -97,6 +100,7 @@ reports/cucumber/cucumber-report.json
 reports/cucumber/messages.ndjson
 reports/cucumber/cucumber-report.html
 reports/history/latest-summary.json
+reports/test-data-registry.json
 ```
 
 Run `npm run report:html` after a Cypress run to generate the HTML report locally. GitHub Actions
@@ -109,8 +113,11 @@ Run `npm run report:history` to generate a compact machine-readable trend summar
 - Selector helper commands are centralized in `cypress/support/utils/selectors.js`.
 - Selector policy is documented in `docs/selector-strategy.md`.
 - Accessibility policy is documented in `docs/accessibility.md`.
+- CI matrix strategy is documented in `docs/ci-strategy.md`.
+- Test data lifecycle is documented in `docs/test-data-management.md`.
+- Visual smoke baselines are documented in `docs/visual-smoke.md`.
 - Cypress retries run only in CI; local run mode stays retry-free for faster failure feedback.
-- GitHub Actions runs a browser/tag matrix and uploads isolated artifacts per matrix leg.
+- GitHub Actions runs a browser/tag/domain matrix and uploads isolated artifacts per matrix leg.
 - Accessibility smoke uses axe and fails on serious or critical violations.
 - Report history writes a compact summary to `reports/history/latest-summary.json`.
 
@@ -137,9 +144,12 @@ EventHubAutomation-Cypress/
       features/
         api/
         auth/
+        accessibility/
         events/
         bookings/
         admin/
+        hybrid/
+        visual/
       step_definitions/
     fixtures/
       test-data/

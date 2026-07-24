@@ -8,7 +8,32 @@ on:
       - main
 
 jobs:
+  doctor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      EVENTHUB_BASE_URL: ${{ secrets.EVENTHUB_BASE_URL }}
+      EVENTHUB_API_BASE_URL: ${{ secrets.EVENTHUB_API_BASE_URL }}
+      EVENTHUB_USER_EMAIL: ${{ secrets.EVENTHUB_USER_EMAIL }}
+      EVENTHUB_USER_PASSWORD: ${{ secrets.EVENTHUB_USER_PASSWORD }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run framework doctor
+        run: npm run doctor
+
   cypress:
+    needs: doctor
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -18,15 +43,31 @@ jobs:
           - name: smoke-chrome
             tags: "@smoke"
             browser: chrome
+            spec: ""
           - name: smoke-electron
             tags: "@smoke"
             browser: electron
-          - name: regression-chrome
+            spec: ""
+          - name: regression-auth-events
             tags: "@regression"
             browser: chrome
+            spec: "cypress/e2e/features/auth/*.feature,cypress/e2e/features/events/*.feature"
+          - name: regression-bookings-admin
+            tags: "@regression"
+            browser: chrome
+            spec: "cypress/e2e/features/bookings/*.feature,cypress/e2e/features/admin/*.feature"
+          - name: regression-api-hybrid
+            tags: "@regression"
+            browser: chrome
+            spec: "cypress/e2e/features/api/*.feature,cypress/e2e/features/hybrid/*.feature"
           - name: accessibility-chrome
             tags: "@accessibility"
             browser: chrome
+            spec: "cypress/e2e/features/accessibility/*.feature"
+          - name: visual-chrome
+            tags: "@visual"
+            browser: chrome
+            spec: "cypress/e2e/features/visual/*.feature"
     env:
       EVENTHUB_BASE_URL: ${{ secrets.EVENTHUB_BASE_URL }}
       EVENTHUB_API_BASE_URL: ${{ secrets.EVENTHUB_API_BASE_URL }}
@@ -49,7 +90,16 @@ jobs:
         run: npm run lint
 
       - name: Run Cypress ${{ matrix.name }} suite
-        run: env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="${{ matrix.tags }}" --browser "${{ matrix.browser }}"
+        env:
+          CYPRESS_BROWSER: ${{ matrix.browser }}
+          CYPRESS_SPEC: ${{ matrix.spec }}
+          CYPRESS_TAGS: ${{ matrix.tags }}
+        run: |
+          if [ -n "$CYPRESS_SPEC" ]; then
+            env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="$CYPRESS_TAGS" --browser "$CYPRESS_BROWSER" --spec "$CYPRESS_SPEC"
+          else
+            env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="$CYPRESS_TAGS" --browser "$CYPRESS_BROWSER"
+          fi
 
       - name: Generate Cucumber HTML report
         if: always()
