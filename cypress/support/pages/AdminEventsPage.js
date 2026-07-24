@@ -21,6 +21,17 @@ export default class AdminEventsPage {
     cy.contains("button", "+ Add Event").click();
   }
 
+  submitEmptyEventForm() {
+    cy.contains("button", "+ Add Event").click();
+  }
+
+  assertRequiredFieldValidation() {
+    cy.findByLabelOrPlaceholder("Title", "Event title").should("match", ":invalid");
+    cy.get('input[type="datetime-local"]').should("match", ":invalid");
+    cy.findByLabelOrPlaceholder("Price", "").should("match", ":invalid");
+    cy.findByLabelOrPlaceholder("Total Seats", "").should("match", ":invalid");
+  }
+
   assertEventInTable(eventTitle) {
     cy.contains("tr", eventTitle).should("be.visible");
   }
@@ -28,6 +39,26 @@ export default class AdminEventsPage {
   assertReadOnlySeededEvents() {
     ["Dilli Diwali Mela", "Hollywood Monsoon Night", "World Tech Summit"].forEach((eventTitle) => {
       cy.contains("tr", eventTitle).contains("Read-only").should("be.visible");
+    });
+  }
+
+  assertUserEventLimitEnforced(limit = 6) {
+    cy.get("body").then(($body) => {
+      const pageText = $body.text();
+      const addButton = [...$body.find("button")].find((button) =>
+        button.innerText.includes("+ Add Event"),
+      );
+
+      const hasLimitMessage = new RegExp(
+        `(limit|max|maximum|only).*${limit}|${limit}.*events`,
+        "i",
+      ).test(pageText);
+      const addButtonDisabled = addButton?.disabled === true;
+
+      expect(
+        hasLimitMessage || addButtonDisabled,
+        `Expected the admin page to show a ${limit}-event limit message or disable event creation.`,
+      ).to.eq(true);
     });
   }
 }

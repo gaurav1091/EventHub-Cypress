@@ -5,6 +5,28 @@ export default class EventDetailPage {
     cy.contains("button", "Confirm Booking").should("be.visible");
   }
 
+  assertMetadata(details = {}) {
+    if (details.category) {
+      cy.contains(details.category).should("be.visible");
+    }
+
+    if (details.city) {
+      cy.contains(details.city).should("be.visible");
+    }
+
+    if (details.venue) {
+      cy.contains(details.venue).should("be.visible");
+    }
+
+    if (details.price) {
+      cy.contains(details.price).should("be.visible");
+    }
+
+    if (details.shouldShowSeats) {
+      cy.contains(/\d+\s+seats/i).should("be.visible");
+    }
+  }
+
   increaseTickets(times = 1) {
     for (let count = 0; count < times; count += 1) {
       cy.contains("button", "+").click();
@@ -64,6 +86,12 @@ export default class EventDetailPage {
       .parent()
       .invoke("text")
       .should("match", /[A-Z]-[A-Z0-9]{6}/);
+  }
+
+  assertBookingConfirmationDetails(customer, totalAmount) {
+    this.assertBookingConfirmed(customer);
+    cy.contains(customer.email).should("be.visible");
+    cy.contains(totalAmount).should("be.visible");
   }
 
   viewMyBookings() {

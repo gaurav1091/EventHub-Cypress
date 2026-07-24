@@ -27,8 +27,23 @@ When("I book {int} ticket for event {string}", (quantity, eventName) => {
   eventDetailPage.confirmBooking();
 });
 
+When("I book {int} tickets for event {string}", (quantity, eventName) => {
+  currentCustomer = bookingCustomer();
+
+  eventsPage.visit();
+  eventsPage.bookEvent(eventName);
+  eventDetailPage.assertLoaded(eventName);
+  eventDetailPage.increaseTickets(quantity - 1);
+  eventDetailPage.fillBookingForm(currentCustomer);
+  eventDetailPage.confirmBooking();
+});
+
 Then("I should see the booking confirmation", () => {
   eventDetailPage.assertBookingConfirmed(currentCustomer);
+});
+
+Then("I should see a booking confirmation with total {string}", (totalAmount) => {
+  eventDetailPage.assertBookingConfirmationDetails(currentCustomer, totalAmount);
 });
 
 When("I open My Bookings from the confirmation", () => {
@@ -38,6 +53,31 @@ When("I open My Bookings from the confirmation", () => {
 Then("I should see booking for event {string}", (eventName) => {
   bookingsPage.assertLoaded();
   bookingsPage.assertBookingVisible(eventName);
+});
+
+Then("I should not see booking for event {string}", (eventName) => {
+  bookingsPage.assertLoaded();
+  bookingsPage.assertNoBookingsForCustomer(currentCustomer);
+});
+
+When("I open the booking details", () => {
+  bookingsPage.openFirstBookingDetails();
+});
+
+Then("I should see the booking details for event {string}", (eventName) => {
+  bookingsPage.assertBookingDetails(eventName, currentCustomer);
+});
+
+When("I cancel the booking", () => {
+  bookingsPage.cancelFirstBooking();
+});
+
+When("I clear all bookings", () => {
+  bookingsPage.clearAllBookingsIfPresent();
+});
+
+Then("no bookings for the current Cypress customer should remain", () => {
+  bookingsPage.assertNoBookingsForCustomer(currentCustomer);
 });
 
 Then("the ticket quantity should be {int}", (quantity) => {

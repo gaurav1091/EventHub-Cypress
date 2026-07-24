@@ -11,6 +11,34 @@ Feature: Event booking lifecycle
     When I open My Bookings from the confirmation
     Then I should see booking for event "Dilli Diwali Mela"
 
+  @regression @stateful
+  Scenario: User can book multiple tickets and see the correct confirmation total
+    When I book 2 tickets for event "Dilli Diwali Mela"
+    Then I should see a booking confirmation with total "$600"
+    When I open My Bookings from the confirmation
+    Then I should see booking for event "Dilli Diwali Mela"
+
+  @regression @stateful
+  Scenario: User can view booking details
+    When I book 1 ticket for event "Dilli Diwali Mela"
+    And I open My Bookings from the confirmation
+    And I open the booking details
+    Then I should see the booking details for event "Dilli Diwali Mela"
+
+  @regression @stateful
+  Scenario: User can cancel a booking
+    When I book 1 ticket for event "Dilli Diwali Mela"
+    And I open My Bookings from the confirmation
+    And I cancel the booking
+    Then I should not see booking for event "Dilli Diwali Mela"
+
+  @regression @stateful
+  Scenario: User can clear all bookings
+    When I book 1 ticket for event "Dilli Diwali Mela"
+    And I open My Bookings from the confirmation
+    And I clear all bookings
+    Then no bookings for the current Cypress customer should remain
+
   @regression
   Scenario: Event detail page shows booking form and event content
     When I open details for event "World Tech Summit"

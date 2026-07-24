@@ -31,10 +31,20 @@ export default class EventsPage {
     });
   }
 
+  openEventFromTitle(eventName) {
+    cy.contains("article", eventName).within(() => {
+      cy.contains("h2, h3, a", eventName).click();
+    });
+  }
+
   bookEvent(eventName) {
     cy.contains("article", eventName).within(() => {
       cy.contains("Book Now").click();
     });
+  }
+
+  openEventFromBookNow(eventName) {
+    this.bookEvent(eventName);
   }
 
   assertEventVisible(eventName) {
@@ -59,6 +69,8 @@ export default class EventsPage {
       }
 
       cy.contains(/seats left/i).should("be.visible");
+
+      cy.contains(/\d+\s+seats left/i).should("be.visible");
     });
   }
 

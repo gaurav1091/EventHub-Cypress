@@ -46,4 +46,14 @@ Feature: Event discovery
   @regression
   Scenario: Event cards expose business-critical details
     When I open the Events page
-    Then event "Dilli Diwali Mela" card should show category "Festival", city "Delhi", and price "$300"
+    Then event "Dilli Diwali Mela" card should show category "Festival", city "Delhi", price "$300", seats, and Book Now
+
+  @regression
+  Scenario: User can open event details from the event title
+    When I open details from the title for event "World Tech Summit"
+    Then I should see metadata for event "World Tech Summit"
+
+  @regression
+  Scenario: User can open event details from Book Now
+    When I open details from Book Now for event "Dilli Diwali Mela"
+    Then I should see metadata for event "Dilli Diwali Mela"
