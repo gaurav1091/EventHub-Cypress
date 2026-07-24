@@ -4,10 +4,20 @@ const path = require("path");
 const cucumberJsonPath = path.join("reports", "cucumber", "cucumber-report.json");
 const historyDir = path.join("reports", "history");
 const latestPath = path.join(historyDir, "latest-summary.json");
+const historyPath = path.join(historyDir, "history.json");
+const maxHistoryRuns = Number(process.env.EVENTHUB_HISTORY_LIMIT || 100);
 
 function emptySummary() {
   return {
     generatedAt: new Date().toISOString(),
+    run: {
+      id: process.env.GITHUB_RUN_ID || null,
+      attempt: process.env.GITHUB_RUN_ATTEMPT || null,
+      job: process.env.GITHUB_JOB || null,
+      ref: process.env.GITHUB_REF_NAME || null,
+      sha: process.env.GITHUB_SHA || null,
+      environment: process.env.EVENTHUB_ENV || "qa",
+    },
     totals: {
       features: 0,
       scenarios: 0,
@@ -53,11 +63,43 @@ function scenarioStatus(scenario) {
 }
 
 function readPreviousSummary() {
+  const history = readHistory();
+  const previousRun = history.runs.at(-1);
+
+  if (previousRun) {
+    return previousRun.summary;
+  }
+
   if (!fs.existsSync(latestPath)) {
     return emptySummary();
   }
 
   return JSON.parse(fs.readFileSync(latestPath, "utf8"));
+}
+
+function readHistory() {
+  if (!fs.existsSync(historyPath)) {
+    return {
+      generatedAt: new Date().toISOString(),
+      runs: [],
+    };
+  }
+
+  return JSON.parse(fs.readFileSync(historyPath, "utf8"));
+}
+
+function writeHistory(summary) {
+  const history = readHistory();
+
+  history.generatedAt = new Date().toISOString();
+  history.runs.push({
+    generatedAt: summary.generatedAt,
+    run: summary.run,
+    summary,
+  });
+  history.runs = history.runs.slice(-maxHistoryRuns);
+
+  fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
 }
 
 function summarize(features, previousSummary = emptySummary()) {
@@ -144,7 +186,8 @@ const summary = summarize(features, previousSummary);
 
 fs.mkdirSync(historyDir, { recursive: true });
 fs.writeFileSync(latestPath, JSON.stringify(summary, null, 2));
+writeHistory(summary);
 
 console.log(
-  `Report history generated at ${latestPath}: ${summary.totals.passed}/${summary.totals.scenarios} scenarios passed.`,
+  `Report history generated at ${latestPath}: ${summary.totals.passed}/${summary.totals.scenarios} scenarios passed. Persistent runs: ${readHistory().runs.length}.`,
 );

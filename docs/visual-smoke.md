@@ -7,6 +7,7 @@ Run:
 
 ```bash
 npm run test:visual
+npm run visual:compare
 ```
 
 Current baseline pages:
@@ -18,5 +19,20 @@ Current baseline pages:
 - Admin Events.
 - Booking confirmation.
 
-The current implementation captures screenshots only. A later upgrade can add pixel comparison,
-thresholds, and approved baseline storage once the functional suite is stable.
+## Comparison
+
+`npm run visual:compare` compares captured screenshots under `cypress/screenshots/**/visual/` to
+approved baselines in `cypress/visual-baselines`.
+
+Missing baselines are reported but do not fail by default. This keeps visual smoke optional and
+low-noise while the UI is still evolving.
+
+Useful environment variables:
+
+- `EVENTHUB_VISUAL_BASELINE_DIR`
+- `EVENTHUB_VISUAL_SCREENSHOTS_DIR`
+- `EVENTHUB_VISUAL_DIFF_DIR`
+- `EVENTHUB_VISUAL_THRESHOLD`
+- `EVENTHUB_VISUAL_REQUIRE_BASELINES=true`
+
+When a baseline is intentionally approved, place the matching `.png` in `cypress/visual-baselines`.

@@ -39,6 +39,8 @@ EVENTHUB_USER_PASSWORD=your_password
 | `npm run test:prod-smoke`  | `@smoke and not @stateful` | Future production-safe smoke run                   |
 | `npm run report:html`      | Cucumber messages to HTML  | Generates `reports/cucumber/cucumber-report.html`  |
 | `npm run report:history`   | Report history summary     | Generates status, duration, and slowest-test data  |
+| `npm run report:combined`  | Combined CI report summary | Aggregates downloaded matrix report artifacts      |
+| `npm run visual:compare`   | Visual comparison          | Compares screenshots to approved baselines         |
 
 Current verified suites:
 
@@ -102,13 +104,15 @@ reports/cucumber/cucumber-report.json
 reports/cucumber/messages.ndjson
 reports/cucumber/cucumber-report.html
 reports/history/latest-summary.json
+reports/history/history.json
+reports/combined/combined-summary.json
 reports/test-data-registry.json
 ```
 
 Run `npm run report:html` after a Cypress run to generate the HTML report locally. GitHub Actions
 also runs this step with `if: always()` so failed test runs still upload the available report assets.
-Run `npm run report:history` to generate a compact machine-readable trend summary with scenario
-duration, previous-status metadata, and slowest-scenario details.
+Run `npm run report:history` to generate machine-readable latest and persistent trend summaries with
+scenario duration, previous-status metadata, and slowest-scenario details.
 
 ## Enterprise Conventions
 
@@ -117,6 +121,7 @@ duration, previous-status metadata, and slowest-scenario details.
 - Selector policy is documented in `docs/selector-strategy.md`.
 - Accessibility policy is documented in `docs/accessibility.md`.
 - CI matrix strategy is documented in `docs/ci-strategy.md`.
+- Framework architecture is documented in `docs/framework-architecture.md`.
 - Contribution standards are documented in `docs/contributing.md`.
 - BDD authoring standards are documented in `docs/test-authoring-guide.md`.
 - Tagging standards are documented in `docs/tagging-strategy.md`.
@@ -126,6 +131,8 @@ duration, previous-status metadata, and slowest-scenario details.
 - GitHub Actions runs separate doctor, lint, smoke, regression, accessibility, visual, and report-summary jobs.
 - Accessibility smoke uses axe and fails on serious or critical violations.
 - Report history writes scenario status, duration, previous-result metadata, and slowest scenarios to `reports/history/latest-summary.json`.
+- API contracts are validated with JSON Schema through AJV.
+- Visual comparison is optional and compares captured screenshots to `cypress/visual-baselines`.
 
 ## Framework Principles
 

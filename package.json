@@ -24,6 +24,8 @@
     "doctor": "node scripts/doctor.js",
     "report:html": "node scripts/generate-cucumber-html-report.js",
     "report:history": "node scripts/generate-report-history.js",
+    "report:combined": "node scripts/generate-combined-report-summary.js",
+    "visual:compare": "node scripts/compare-visual-baselines.js",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -31,6 +33,7 @@
   "devDependencies": {
     "@badeball/cypress-cucumber-preprocessor": "^26.0.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
+    "ajv": "^8.20.0",
     "axe-core": "^4.12.1",
     "cypress": "14.5.4",
     "cypress-axe": "^1.7.0",
@@ -38,6 +41,8 @@
     "esbuild": "^0.28.1",
     "eslint": "^10.7.0",
     "eslint-plugin-cypress": "^6.4.3",
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0",
     "prettier": "^3.9.6"
   },
   "overrides": {

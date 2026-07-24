@@ -1,3 +1,12 @@
+import Ajv from "ajv";
+
+const ajv = new Ajv({
+  allErrors: true,
+  strict: false,
+});
+
+const compiledSchemas = new WeakMap();
+
 export function assertRequiredFields(subject, requiredFields, label = "response body") {
   requiredFields.forEach((field) => {
     expect(subject, `${label} should include ${field}`).to.have.property(field);
@@ -29,7 +38,26 @@ export function assertFieldPatterns(subject, fieldPatterns = {}, label = "respon
   });
 }
 
+export function assertJsonSchema(subject, jsonSchema, label = "response body") {
+  if (!jsonSchema) {
+    return;
+  }
+
+  let validate = compiledSchemas.get(jsonSchema);
+
+  if (!validate) {
+    validate = ajv.compile(jsonSchema);
+    compiledSchemas.set(jsonSchema, validate);
+  }
+
+  const isValid = validate(subject);
+  const errorText = ajv.errorsText(validate.errors, { dataVar: label });
+
+  expect(isValid, `${label} should match JSON schema: ${errorText}`).to.eq(true);
+}
+
 export function assertSchema(subject, schema, label = "response body") {
+  assertJsonSchema(subject, schema.jsonSchema, label);
   assertRequiredFields(subject, schema.requiredFields || [], label);
   assertFieldTypes(subject, schema.fieldTypes || {}, label);
   assertFieldPatterns(subject, schema.fieldPatterns || {}, label);

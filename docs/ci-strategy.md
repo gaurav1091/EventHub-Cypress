@@ -43,4 +43,5 @@ triage and gives the project a path toward true parallelization if Cypress Cloud
 is added later.
 
 `report-summary` downloads all `cypress-reports-*` artifacts and republishes a combined bundle for
-easier run-level review.
+easier run-level review. It also generates `reports/combined/combined-summary.json`, which aggregates
+scenario totals and slowest scenarios across all downloaded matrix artifacts.
