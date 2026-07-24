@@ -31,6 +31,7 @@ EVENTHUB_USER_PASSWORD=your_password
 | `npm run test:admin`       | Admin feature specs        | Event management checks                           |
 | `npm run test:api`         | API feature specs          | API smoke and support-client checks               |
 | `npm run test:hybrid`      | Hybrid feature specs       | API-created data verified through the UI          |
+| `npm run test:a11y`        | Accessibility specs        | Axe serious/critical accessibility smoke          |
 | `npm run test:qa:smoke`    | QA `@smoke` scenarios      | Explicit QA profile smoke run                     |
 | `npm run test:stage:smoke` | Stage `@smoke` scenarios   | Future stage profile smoke run                    |
 | `npm run test:prod-smoke`  | `@smoke and not @stateful` | Future production-safe smoke run                  |
@@ -95,18 +96,23 @@ The framework keeps Badeball/Cucumber JSON and message outputs enabled:
 reports/cucumber/cucumber-report.json
 reports/cucumber/messages.ndjson
 reports/cucumber/cucumber-report.html
+reports/history/latest-summary.json
 ```
 
 Run `npm run report:html` after a Cypress run to generate the HTML report locally. GitHub Actions
 also runs this step with `if: always()` so failed test runs still upload the available report assets.
+Run `npm run report:history` to generate a compact machine-readable trend summary.
 
 ## Enterprise Conventions
 
 - Route paths are centralized in `cypress/support/constants/routes.js`.
 - Selector helper commands are centralized in `cypress/support/utils/selectors.js`.
 - Selector policy is documented in `docs/selector-strategy.md`.
+- Accessibility policy is documented in `docs/accessibility.md`.
 - Cypress retries run only in CI; local run mode stays retry-free for faster failure feedback.
 - GitHub Actions runs a browser/tag matrix and uploads isolated artifacts per matrix leg.
+- Accessibility smoke uses axe and fails on serious or critical violations.
+- Report history writes a compact summary to `reports/history/latest-summary.json`.
 
 ## Framework Principles
 

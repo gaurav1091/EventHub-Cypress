@@ -1,3 +1,4 @@
+import "cypress-axe";
 import "./utils/formControls";
 import "./utils/selectors";
 import "./commands";

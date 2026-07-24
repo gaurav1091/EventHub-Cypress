@@ -18,8 +18,10 @@
     "test:admin": "env -u ELECTRON_RUN_AS_NODE cypress run --spec 'cypress/e2e/features/admin/*.feature'",
     "test:api": "env -u ELECTRON_RUN_AS_NODE cypress run --spec 'cypress/e2e/features/api/*.feature'",
     "test:hybrid": "env -u ELECTRON_RUN_AS_NODE cypress run --spec 'cypress/e2e/features/hybrid/*.feature'",
+    "test:a11y": "env -u ELECTRON_RUN_AS_NODE cypress run --spec 'cypress/e2e/features/accessibility/*.feature'",
     "cleanup:test-data": "node scripts/cleanup-test-data.js",
     "report:html": "node scripts/generate-cucumber-html-report.js",
+    "report:history": "node scripts/generate-report-history.js",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -27,7 +29,9 @@
   "devDependencies": {
     "@badeball/cypress-cucumber-preprocessor": "^26.0.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
+    "axe-core": "^4.12.1",
     "cypress": "14.5.4",
+    "cypress-axe": "^1.7.0",
     "dotenv": "^17.4.2",
     "esbuild": "^0.28.1",
     "eslint": "^10.7.0",

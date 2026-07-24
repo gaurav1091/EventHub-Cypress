@@ -24,6 +24,9 @@ jobs:
           - name: regression-chrome
             tags: "@regression"
             browser: chrome
+          - name: accessibility-chrome
+            tags: "@accessibility"
+            browser: chrome
     env:
       EVENTHUB_BASE_URL: ${{ secrets.EVENTHUB_BASE_URL }}
       EVENTHUB_API_BASE_URL: ${{ secrets.EVENTHUB_API_BASE_URL }}
@@ -51,6 +54,10 @@ jobs:
       - name: Generate Cucumber HTML report
         if: always()
         run: npm run report:html
+
+      - name: Generate report history summary
+        if: always()
+        run: npm run report:history
 
       - name: Upload reports
         if: always()
