@@ -30,6 +30,7 @@ EVENTHUB_USER_PASSWORD=your_password
 | `npm run test:bookings`    | Booking feature specs      | Booking lifecycle and validation checks           |
 | `npm run test:admin`       | Admin feature specs        | Event management checks                           |
 | `npm run test:api`         | API feature specs          | API smoke and support-client checks               |
+| `npm run test:hybrid`      | Hybrid feature specs       | API-created data verified through the UI          |
 | `npm run test:qa:smoke`    | QA `@smoke` scenarios      | Explicit QA profile smoke run                     |
 | `npm run test:stage:smoke` | Stage `@smoke` scenarios   | Future stage profile smoke run                    |
 | `npm run test:prod-smoke`  | `@smoke and not @stateful` | Future production-safe smoke run                  |

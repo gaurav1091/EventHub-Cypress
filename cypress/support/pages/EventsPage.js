@@ -68,8 +68,6 @@ export default class EventsPage {
         cy.contains(details.price).should("be.visible");
       }
 
-      cy.contains(/seats left/i).should("be.visible");
-
       cy.contains(/\d+\s+seats left/i).should("be.visible");
     });
   }

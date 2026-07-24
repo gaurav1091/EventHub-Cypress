@@ -1,97 +1,52 @@
+import AuthApi from "./AuthApi";
+import EventsApi from "./EventsApi";
+import AdminEventsApi from "./AdminEventsApi";
+import BookingsApi from "./BookingsApi";
+
 export default class EventHubClient {
   constructor(apiBaseUrl = Cypress.env("apiBaseUrl")) {
     this.apiBaseUrl = apiBaseUrl;
     this.token = null;
+    this.auth = new AuthApi(this);
+    this.events = new EventsApi(this);
+    this.adminEvents = new AdminEventsApi(this);
+    this.bookings = new BookingsApi(this);
   }
 
-  login(email = Cypress.env("userEmail"), password = Cypress.env("userPassword")) {
-    return cy
-      .request({
-        method: "POST",
-        url: `${this.apiBaseUrl}/api/auth/login`,
-        body: {
-          email,
-          password,
-        },
-      })
-      .then((response) => {
-        expect(response.status).to.eq(200);
-        expect(response.body.success).to.eq(true);
-        expect(response.body.token).to.be.a("string").and.not.be.empty;
-        this.token = response.body.token;
-        return response.body;
-      });
+  login(email, password) {
+    return this.auth.login(email, password);
   }
 
   getCurrentUser() {
-    return this.authenticatedRequest({
-      method: "GET",
-      url: `${this.apiBaseUrl}/api/auth/me`,
-    });
+    return this.auth.getCurrentUser();
   }
 
   getEvents() {
-    return this.authenticatedRequest({
-      method: "GET",
-      url: `${this.apiBaseUrl}/api/events`,
-    });
+    return this.events.getEvents();
   }
 
   getEvent(eventId) {
-    return this.authenticatedRequest({
-      method: "GET",
-      url: `${this.apiBaseUrl}/api/events/${eventId}`,
-    });
+    return this.events.getEvent(eventId);
   }
 
   createEvent(event) {
-    return this.authenticatedRequest({
-      method: "POST",
-      url: `${this.apiBaseUrl}/api/events`,
-      body: {
-        title: event.title,
-        description: event.description,
-        category: event.category,
-        venue: event.venue,
-        city: event.city,
-        eventDate: event.eventDate || `${event.dateTime}:00.000Z`,
-        price: Number(event.price),
-        totalSeats: Number(event.totalSeats),
-        imageUrl: event.imageUrl,
-      },
-    });
+    return this.adminEvents.createEvent(event);
   }
 
   deleteEvent(eventId) {
-    return this.authenticatedRequest({
-      method: "DELETE",
-      url: `${this.apiBaseUrl}/api/events/${eventId}`,
-      failOnStatusCode: false,
-    });
+    return this.adminEvents.deleteEvent(eventId);
   }
 
   getBookings(query = {}) {
-    return this.authenticatedRequest({
-      method: "GET",
-      url: `${this.apiBaseUrl}/api/bookings`,
-      qs: query,
-    });
+    return this.bookings.getBookings(query);
   }
 
   createBooking(booking) {
-    return this.authenticatedRequest({
-      method: "POST",
-      url: `${this.apiBaseUrl}/api/bookings`,
-      body: booking,
-    });
+    return this.bookings.createBooking(booking);
   }
 
   deleteBooking(bookingId) {
-    return this.authenticatedRequest({
-      method: "DELETE",
-      url: `${this.apiBaseUrl}/api/bookings/${bookingId}`,
-      failOnStatusCode: false,
-    });
+    return this.bookings.deleteBooking(bookingId);
   }
 
   cleanupBookingsByCustomerPrefix(prefix = "Cypress User") {

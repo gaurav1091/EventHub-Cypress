@@ -16,6 +16,11 @@ Feature: EventHub API smoke
     When I request events through the API
     Then the API events response should include seeded EventHub events
 
+  @regression
+  Scenario: Authenticated user can retrieve an event detail through API
+    When I request event "World Tech Summit" through the API
+    Then the API event detail response should describe "World Tech Summit"
+
   @smoke
   Scenario: Authenticated user can create and cancel a booking through API
     When I create a booking through the API

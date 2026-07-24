@@ -1,12 +1,23 @@
 import { Then, When } from "@badeball/cypress-cucumber-preprocessor";
 import EventHubClient from "../../../support/api/EventHubClient";
 import { apiBookingPayload } from "../../../support/data/TestDataFactory";
+import { assertSuccessfulLogin } from "../../../support/api/assertions/authAssertions";
+import {
+  assertEventDetail,
+  assertEventsResponse,
+  assertSeededEventsPresent,
+} from "../../../support/api/assertions/eventAssertions";
+import {
+  assertBookingCancelled,
+  assertBookingCreated,
+} from "../../../support/api/assertions/bookingAssertions";
 
 const eventHubClient = new EventHubClient();
 
 let apiResponse;
 let apiBooking;
 let cancellationResponse;
+let selectedEvent;
 
 When("I request the API health endpoint", () => {
   cy.request(`${Cypress.env("apiBaseUrl")}/api/health`).then((response) => {
@@ -27,9 +38,7 @@ When("I authenticate through the API", () => {
 });
 
 Then("the API should return the registered user identity", () => {
-  expect(apiResponse.body.success).to.eq(true);
-  expect(apiResponse.body.user.email).to.eq(Cypress.env("userEmail"));
-  expect(apiResponse.body.token).to.be.a("string").and.not.be.empty;
+  assertSuccessfulLogin(apiResponse.body);
 });
 
 When("I request events through the API", () => {
@@ -41,13 +50,24 @@ When("I request events through the API", () => {
 });
 
 Then("the API events response should include seeded EventHub events", () => {
-  expect(apiResponse.status).to.eq(200);
-  expect(apiResponse.body.success).to.eq(true);
+  assertEventsResponse(apiResponse);
+  assertSeededEventsPresent(apiResponse.body.data);
+});
 
-  const eventTitles = apiResponse.body.data.map((event) => event.title);
+When("I request event {string} through the API", (eventName) => {
+  eventHubClient.login().then(() => {
+    eventHubClient.getEvents().then((response) => {
+      selectedEvent = response.body.data.find((event) => event.title === eventName);
+      expect(selectedEvent, `Expected API event named ${eventName}`).to.exist;
+      eventHubClient.getEvent(selectedEvent.id).then((eventResponse) => {
+        apiResponse = eventResponse;
+      });
+    });
+  });
+});
 
-  expect(eventTitles).to.include("Dilli Diwali Mela");
-  expect(eventTitles).to.include("World Tech Summit");
+Then("the API event detail response should describe {string}", (eventName) => {
+  assertEventDetail(apiResponse, eventName);
 });
 
 When("I create a booking through the API", () => {
@@ -60,9 +80,7 @@ When("I create a booking through the API", () => {
 });
 
 Then("the API booking response should include a booking reference", () => {
-  expect(apiResponse.status).to.eq(201);
-  expect(apiResponse.body.success).to.eq(true);
-  expect(apiBooking.bookingRef).to.match(/^[A-Z]-[A-Z0-9]{6}$/);
+  assertBookingCreated(apiResponse);
 });
 
 When("I cancel the API-created booking", () => {
@@ -72,6 +90,5 @@ When("I cancel the API-created booking", () => {
 });
 
 Then("the API booking cancellation should be successful", () => {
-  expect(cancellationResponse.status).to.eq(200);
-  expect(cancellationResponse.body.success).to.eq(true);
+  assertBookingCancelled(cancellationResponse);
 });

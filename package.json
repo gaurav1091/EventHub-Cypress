@@ -17,6 +17,7 @@
     "test:bookings": "env -u ELECTRON_RUN_AS_NODE cypress run --spec 'cypress/e2e/features/bookings/*.feature'",
     "test:admin": "env -u ELECTRON_RUN_AS_NODE cypress run --spec 'cypress/e2e/features/admin/*.feature'",
     "test:api": "env -u ELECTRON_RUN_AS_NODE cypress run --spec 'cypress/e2e/features/api/*.feature'",
+    "test:hybrid": "env -u ELECTRON_RUN_AS_NODE cypress run --spec 'cypress/e2e/features/hybrid/*.feature'",
     "cleanup:test-data": "node scripts/cleanup-test-data.js",
     "report:html": "node scripts/generate-cucumber-html-report.js",
     "lint": "eslint .",
