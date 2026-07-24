@@ -1,0 +1,19 @@
+{
+  "events": [
+    {
+      "title": "Dilli Diwali Mela",
+      "category": "Festival",
+      "city": "Delhi"
+    },
+    {
+      "title": "Hollywood Monsoon Night — Los Angeles",
+      "category": "Concert",
+      "city": "Los Angeles"
+    },
+    {
+      "title": "World Tech Summit",
+      "category": "Conference",
+      "city": "Hyderabad"
+    }
+  ]
+}

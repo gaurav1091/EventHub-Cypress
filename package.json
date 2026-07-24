@@ -1,0 +1,53 @@
+{
+  "name": "eventhub-automation-cypress",
+  "version": "0.1.0",
+  "description": "Enterprise-ready Cypress JavaScript BDD framework for EventHub UI and future API automation.",
+  "private": true,
+  "scripts": {
+    "cy:open": "env -u ELECTRON_RUN_AS_NODE cypress open",
+    "cy:run": "env -u ELECTRON_RUN_AS_NODE cypress run",
+    "test": "env -u ELECTRON_RUN_AS_NODE cypress run",
+    "test:smoke": "env -u ELECTRON_RUN_AS_NODE cypress run --env tags=@smoke",
+    "test:regression": "env -u ELECTRON_RUN_AS_NODE cypress run --env tags=@regression",
+    "test:auth": "env -u ELECTRON_RUN_AS_NODE cypress run --spec 'cypress/e2e/features/auth/*.feature'",
+    "test:events": "env -u ELECTRON_RUN_AS_NODE cypress run --spec 'cypress/e2e/features/events/*.feature'",
+    "test:bookings": "env -u ELECTRON_RUN_AS_NODE cypress run --spec 'cypress/e2e/features/bookings/*.feature'",
+    "test:admin": "env -u ELECTRON_RUN_AS_NODE cypress run --spec 'cypress/e2e/features/admin/*.feature'",
+    "test:api": "env -u ELECTRON_RUN_AS_NODE cypress run --spec 'cypress/e2e/features/api/*.feature'",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@badeball/cypress-cucumber-preprocessor": "^26.0.0",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
+    "cypress": "14.5.4",
+    "dotenv": "^17.4.2",
+    "esbuild": "^0.28.1",
+    "eslint": "^10.7.0",
+    "eslint-plugin-cypress": "^6.4.3",
+    "prettier": "^3.9.6"
+  },
+  "overrides": {
+    "diff": "^8.0.2",
+    "serialize-javascript": "^7.0.7"
+  },
+  "cypress-cucumber-preprocessor": {
+    "json": {
+      "enabled": true,
+      "output": "reports/cucumber/cucumber-report.json"
+    },
+    "filterSpecs": true,
+    "omitFiltered": true,
+    "messages": {
+      "enabled": true,
+      "output": "reports/cucumber/messages.ndjson"
+    },
+    "stepDefinitions": [
+      "cypress/e2e/step_definitions/**/*.js"
+    ]
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
