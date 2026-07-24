@@ -2,5 +2,13 @@
   "qa": {
     "baseUrl": "https://eventhub.rahulshettyacademy.com",
     "apiBaseUrl": "https://api.eventhub.rahulshettyacademy.com"
+  },
+  "stage": {
+    "baseUrl": "https://eventhub.rahulshettyacademy.com",
+    "apiBaseUrl": "https://api.eventhub.rahulshettyacademy.com"
+  },
+  "prod-smoke": {
+    "baseUrl": "https://eventhub.rahulshettyacademy.com",
+    "apiBaseUrl": "https://api.eventhub.rahulshettyacademy.com"
   }
 }
