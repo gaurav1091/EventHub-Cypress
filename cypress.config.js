@@ -9,6 +9,7 @@ dotenv.config();
 
 const environmentName = process.env.EVENTHUB_ENV || "qa";
 const environment = environments[environmentName];
+const isCi = process.env.CI === "true";
 
 if (!environment) {
   throw new Error(
@@ -49,7 +50,7 @@ module.exports = defineConfig({
   requestTimeout: 30000,
   responseTimeout: 30000,
   retries: {
-    runMode: 1,
+    runMode: isCi ? 1 : 0,
     openMode: 0,
   },
   video: true,

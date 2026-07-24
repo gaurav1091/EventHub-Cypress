@@ -1,6 +1,8 @@
+import routes from "../constants/routes";
+
 export default class BookingsPage {
   visit() {
-    cy.visit("/bookings");
+    cy.visit(routes.bookings);
     this.assertLoaded();
   }
 

@@ -1,4 +1,5 @@
 import "./utils/formControls";
+import "./utils/selectors";
 import "./commands";
 
 beforeEach(() => {

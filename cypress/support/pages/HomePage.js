@@ -1,6 +1,8 @@
+import routes from "../constants/routes";
+
 export default class HomePage {
   visit() {
-    cy.visit("/");
+    cy.visit(routes.home);
   }
 
   assertLoaded() {

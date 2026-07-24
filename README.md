@@ -100,6 +100,14 @@ reports/cucumber/cucumber-report.html
 Run `npm run report:html` after a Cypress run to generate the HTML report locally. GitHub Actions
 also runs this step with `if: always()` so failed test runs still upload the available report assets.
 
+## Enterprise Conventions
+
+- Route paths are centralized in `cypress/support/constants/routes.js`.
+- Selector helper commands are centralized in `cypress/support/utils/selectors.js`.
+- Selector policy is documented in `docs/selector-strategy.md`.
+- Cypress retries run only in CI; local run mode stays retry-free for faster failure feedback.
+- GitHub Actions runs a browser/tag matrix and uploads isolated artifacts per matrix leg.
+
 ## Framework Principles
 
 - Features describe business behavior in Gherkin.

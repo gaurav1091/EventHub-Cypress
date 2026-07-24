@@ -1,6 +1,8 @@
+import routes from "../constants/routes";
+
 export default class EventsPage {
   visit() {
-    cy.visit("/events");
+    cy.visit(routes.events);
     this.assertLoaded();
   }
 

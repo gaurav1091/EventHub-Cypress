@@ -1,6 +1,7 @@
 import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor";
 import LoginPage from "../../../support/pages/LoginPage";
 import NavigationBar from "../../../support/components/NavigationBar";
+import routes from "../../../support/constants/routes";
 
 const loginPage = new LoginPage();
 const navigationBar = new NavigationBar();
@@ -34,17 +35,17 @@ When("I submit the login form without credentials", () => {
 });
 
 Then("I should remain on the login page", () => {
-  cy.location("pathname").should("eq", "/login");
+  cy.location("pathname").should("eq", routes.login);
   loginPage.assertLoaded();
 });
 
 Then("the login form should show required field validation", () => {
-  cy.location("pathname").should("eq", "/login");
+  cy.location("pathname").should("eq", routes.login);
   loginPage.assertNativeValidation();
 });
 
 Then("I should see a login error", () => {
-  cy.location("pathname").should("eq", "/login");
+  cy.location("pathname").should("eq", routes.login);
   cy.get("body").should("contain.text", "Invalid");
 });
 
@@ -53,7 +54,7 @@ When("I open the registration page from login", () => {
 });
 
 Then("I should be on the registration page", () => {
-  cy.location("pathname").should("eq", "/register");
+  cy.location("pathname").should("eq", routes.register);
   cy.contains(/register|create/i).should("be.visible");
 });
 

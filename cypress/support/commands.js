@@ -1,6 +1,7 @@
 import LoginPage from "./pages/LoginPage";
 import NavigationBar from "./components/NavigationBar";
 import EventHubClient from "./api/EventHubClient";
+import routes from "./constants/routes";
 
 Cypress.Commands.add(
   "login",
@@ -22,7 +23,7 @@ Cypress.Commands.add(
       },
       {
         validate() {
-          cy.visit("/");
+          cy.visit(routes.home);
           new NavigationBar().assertAuthenticatedAs(email);
         },
       },
