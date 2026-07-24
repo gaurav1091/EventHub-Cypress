@@ -38,11 +38,13 @@ EVENTHUB_USER_PASSWORD=your_password
 | `npm run test:stage:smoke` | Stage `@smoke` scenarios   | Future stage profile smoke run                     |
 | `npm run test:prod-smoke`  | `@smoke and not @stateful` | Future production-safe smoke run                   |
 | `npm run report:html`      | Cucumber messages to HTML  | Generates `reports/cucumber/cucumber-report.html`  |
+| `npm run report:history`   | Report history summary     | Generates status, duration, and slowest-test data  |
 
 Current verified suites:
 
 - Smoke: 8 passing scenarios across Auth, Events, Bookings, Admin, and API.
-- Regression: 33 passing scenarios across Auth, Events, Bookings, Admin, API, Hybrid, and Accessibility.
+- Regression: 37 passing scenarios across Auth, Events, Bookings, Admin, API, Hybrid, and Accessibility.
+- Visual: 3 passing scenarios covering Login, Events, Event Detail, My Bookings, Admin, and Booking Confirmation baselines.
 
 The npm scripts intentionally unset `ELECTRON_RUN_AS_NODE` because that variable makes Cypress's
 Electron runner launch incorrectly on this machine.
@@ -105,7 +107,8 @@ reports/test-data-registry.json
 
 Run `npm run report:html` after a Cypress run to generate the HTML report locally. GitHub Actions
 also runs this step with `if: always()` so failed test runs still upload the available report assets.
-Run `npm run report:history` to generate a compact machine-readable trend summary.
+Run `npm run report:history` to generate a compact machine-readable trend summary with scenario
+duration, previous-status metadata, and slowest-scenario details.
 
 ## Enterprise Conventions
 
@@ -114,12 +117,15 @@ Run `npm run report:history` to generate a compact machine-readable trend summar
 - Selector policy is documented in `docs/selector-strategy.md`.
 - Accessibility policy is documented in `docs/accessibility.md`.
 - CI matrix strategy is documented in `docs/ci-strategy.md`.
+- Contribution standards are documented in `docs/contributing.md`.
+- BDD authoring standards are documented in `docs/test-authoring-guide.md`.
+- Tagging standards are documented in `docs/tagging-strategy.md`.
 - Test data lifecycle is documented in `docs/test-data-management.md`.
 - Visual smoke baselines are documented in `docs/visual-smoke.md`.
 - Cypress retries run only in CI; local run mode stays retry-free for faster failure feedback.
-- GitHub Actions runs a browser/tag/domain matrix and uploads isolated artifacts per matrix leg.
+- GitHub Actions runs separate doctor, lint, smoke, regression, accessibility, visual, and report-summary jobs.
 - Accessibility smoke uses axe and fails on serious or critical violations.
-- Report history writes a compact summary to `reports/history/latest-summary.json`.
+- Report history writes scenario status, duration, previous-result metadata, and slowest scenarios to `reports/history/latest-summary.json`.
 
 ## Framework Principles
 

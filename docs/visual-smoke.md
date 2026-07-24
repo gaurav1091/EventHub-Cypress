@@ -11,10 +11,12 @@ npm run test:visual
 
 Current baseline pages:
 
+- Login.
 - Events discovery.
 - Event details.
 - My Bookings.
 - Admin Events.
+- Booking confirmation.
 
 The current implementation captures screenshots only. A later upgrade can add pixel comparison,
 thresholds, and approved baseline storage once the functional suite is stable.

@@ -27,3 +27,23 @@ Feature: EventHub API smoke
     Then the API booking response should include a booking reference
     When I cancel the API-created booking
     Then the API booking cancellation should be successful
+
+  @regression @negative
+  Scenario: Invalid credentials are rejected by the API
+    When I authenticate through the API with invalid credentials
+    Then the API should reject the request with status 400
+
+  @regression @negative
+  Scenario: Anonymous user cannot access protected bookings API
+    When I request bookings through the API without authentication
+    Then the API should reject the request with status 401
+
+  @regression @negative
+  Scenario: Unknown event detail request returns not found
+    When I request unknown event detail through the API
+    Then the API should reject the request with status 404
+
+  @regression @negative
+  Scenario: Invalid booking payload is rejected by the API
+    When I create a booking through the API with invalid payload
+    Then the API should reject the request with status 400

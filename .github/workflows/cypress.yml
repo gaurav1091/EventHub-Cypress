@@ -7,15 +7,17 @@ on:
     branches:
       - main
 
+env:
+  EVENTHUB_BASE_URL: ${{ secrets.EVENTHUB_BASE_URL }}
+  EVENTHUB_API_BASE_URL: ${{ secrets.EVENTHUB_API_BASE_URL }}
+  EVENTHUB_USER_EMAIL: ${{ secrets.EVENTHUB_USER_EMAIL }}
+  EVENTHUB_USER_PASSWORD: ${{ secrets.EVENTHUB_USER_PASSWORD }}
+
 jobs:
   doctor:
+    name: Doctor
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      EVENTHUB_BASE_URL: ${{ secrets.EVENTHUB_BASE_URL }}
-      EVENTHUB_API_BASE_URL: ${{ secrets.EVENTHUB_API_BASE_URL }}
-      EVENTHUB_USER_EMAIL: ${{ secrets.EVENTHUB_USER_EMAIL }}
-      EVENTHUB_USER_PASSWORD: ${{ secrets.EVENTHUB_USER_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,6 +27,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -32,47 +35,11 @@ jobs:
       - name: Run framework doctor
         run: npm run doctor
 
-  cypress:
+  lint:
+    name: Lint
     needs: doctor
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: smoke-chrome
-            tags: "@smoke"
-            browser: chrome
-            spec: ""
-          - name: smoke-electron
-            tags: "@smoke"
-            browser: electron
-            spec: ""
-          - name: regression-auth-events
-            tags: "@regression"
-            browser: chrome
-            spec: "cypress/e2e/features/auth/*.feature,cypress/e2e/features/events/*.feature"
-          - name: regression-bookings-admin
-            tags: "@regression"
-            browser: chrome
-            spec: "cypress/e2e/features/bookings/*.feature,cypress/e2e/features/admin/*.feature"
-          - name: regression-api-hybrid
-            tags: "@regression"
-            browser: chrome
-            spec: "cypress/e2e/features/api/*.feature,cypress/e2e/features/hybrid/*.feature"
-          - name: accessibility-chrome
-            tags: "@accessibility"
-            browser: chrome
-            spec: "cypress/e2e/features/accessibility/*.feature"
-          - name: visual-chrome
-            tags: "@visual"
-            browser: chrome
-            spec: "cypress/e2e/features/visual/*.feature"
-    env:
-      EVENTHUB_BASE_URL: ${{ secrets.EVENTHUB_BASE_URL }}
-      EVENTHUB_API_BASE_URL: ${{ secrets.EVENTHUB_API_BASE_URL }}
-      EVENTHUB_USER_EMAIL: ${{ secrets.EVENTHUB_USER_EMAIL }}
-      EVENTHUB_USER_PASSWORD: ${{ secrets.EVENTHUB_USER_PASSWORD }}
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -82,24 +49,46 @@ jobs:
         with:
           node-version: 24
           cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
+      - name: Run ESLint
         run: npm run lint
 
-      - name: Run Cypress ${{ matrix.name }} suite
-        env:
-          CYPRESS_BROWSER: ${{ matrix.browser }}
-          CYPRESS_SPEC: ${{ matrix.spec }}
-          CYPRESS_TAGS: ${{ matrix.tags }}
-        run: |
-          if [ -n "$CYPRESS_SPEC" ]; then
-            env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="$CYPRESS_TAGS" --browser "$CYPRESS_BROWSER" --spec "$CYPRESS_SPEC"
-          else
-            env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="$CYPRESS_TAGS" --browser "$CYPRESS_BROWSER"
-          fi
+      - name: Check formatting
+        run: npm run format:check
+
+  smoke:
+    name: Smoke (${{ matrix.name }})
+    needs: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: chrome
+            browser: chrome
+          - name: electron
+            browser: electron
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run smoke suite
+        run: env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@smoke" --browser "${{ matrix.browser }}"
 
       - name: Generate Cucumber HTML report
         if: always()
@@ -109,12 +98,169 @@ jobs:
         if: always()
         run: npm run report:history
 
-      - name: Upload reports
+      - name: Upload smoke reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-reports-${{ matrix.name }}
+          name: cypress-reports-smoke-${{ matrix.name }}
           path: |
             reports
             cypress/screenshots
             cypress/videos
+
+  regression:
+    name: Regression (${{ matrix.name }})
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: auth-events
+            spec: "cypress/e2e/features/auth/*.feature,cypress/e2e/features/events/*.feature"
+          - name: bookings
+            spec: "cypress/e2e/features/bookings/*.feature"
+          - name: admin
+            spec: "cypress/e2e/features/admin/*.feature"
+          - name: api-hybrid
+            spec: "cypress/e2e/features/api/*.feature,cypress/e2e/features/hybrid/*.feature"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run regression suite
+        run: env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@regression" --browser chrome --spec "${{ matrix.spec }}"
+
+      - name: Generate Cucumber HTML report
+        if: always()
+        run: npm run report:html
+
+      - name: Generate report history summary
+        if: always()
+        run: npm run report:history
+
+      - name: Upload regression reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-reports-regression-${{ matrix.name }}
+          path: |
+            reports
+            cypress/screenshots
+            cypress/videos
+
+  accessibility:
+    name: Accessibility
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run accessibility suite
+        run: env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@accessibility" --browser chrome --spec "cypress/e2e/features/accessibility/*.feature"
+
+      - name: Generate Cucumber HTML report
+        if: always()
+        run: npm run report:html
+
+      - name: Generate report history summary
+        if: always()
+        run: npm run report:history
+
+      - name: Upload accessibility reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-reports-accessibility
+          path: |
+            reports
+            cypress/screenshots
+            cypress/videos
+
+  visual:
+    name: Visual Smoke
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run visual smoke suite
+        run: env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@visual" --browser chrome --spec "cypress/e2e/features/visual/*.feature"
+
+      - name: Generate Cucumber HTML report
+        if: always()
+        run: npm run report:html
+
+      - name: Generate report history summary
+        if: always()
+        run: npm run report:history
+
+      - name: Upload visual reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-reports-visual
+          path: |
+            reports
+            cypress/screenshots
+            cypress/videos
+
+  report-summary:
+    name: Report Summary
+    needs:
+      - regression
+      - accessibility
+      - visual
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download report artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: cypress-reports-*
+          path: combined-artifacts
+
+      - name: List report artifacts
+        run: find combined-artifacts -maxdepth 4 -type f | sort
+
+      - name: Upload combined report bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-reports-combined
+          path: combined-artifacts

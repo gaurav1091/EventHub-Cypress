@@ -10,24 +10,37 @@ GitHub Actions uses a gate-first, domain-split pipeline.
 - Known `EVENTHUB_ENV` profile.
 - Required credentials.
 - Cypress binary availability.
+- Report folder availability.
 - EventHub API health.
 - EventHub API login.
 
 If this job fails, Cypress jobs do not start. That keeps noisy browser failures from hiding environment
 or credential problems.
 
-## Cypress Matrix
+## Pipeline Jobs
 
-The Cypress job runs independent matrix legs:
+The workflow uses separate jobs:
 
-- `smoke-chrome`
-- `smoke-electron`
-- `regression-auth-events`
-- `regression-bookings-admin`
-- `regression-api-hybrid`
-- `accessibility-chrome`
-- `visual-chrome`
+- `doctor`
+- `lint`
+- `smoke`
+- `regression`
+- `accessibility`
+- `visual`
+- `report-summary`
+
+## Cypress Matrix Legs
+
+Smoke runs in both Chrome and Electron. Regression is split by domain:
+
+- `auth-events`
+- `bookings`
+- `admin`
+- `api-hybrid`
 
 Each leg uploads its own reports, screenshots, and videos. Domain-splitting makes failures easier to
 triage and gives the project a path toward true parallelization if Cypress Cloud or another orchestrator
 is added later.
+
+`report-summary` downloads all `cypress-reports-*` artifacts and republishes a combined bundle for
+easier run-level review.

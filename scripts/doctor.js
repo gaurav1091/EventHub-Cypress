@@ -1,5 +1,7 @@
 const { spawnSync } = require("child_process");
 const dotenv = require("dotenv");
+const fs = require("fs");
+const path = require("path");
 const environments = require("../config/environments.json");
 const packageJson = require("../package.json");
 
@@ -53,6 +55,15 @@ function assertCypressBinary() {
   );
 }
 
+function assertReportFolders() {
+  ["reports", path.join("reports", "cucumber"), path.join("reports", "history")].forEach(
+    (folder) => {
+      fs.mkdirSync(folder, { recursive: true });
+      record("Report folder", fs.existsSync(folder), folder);
+    },
+  );
+}
+
 async function assertApiHealth(apiBaseUrl) {
   try {
     const response = await fetch(`${apiBaseUrl}/api/health`);
@@ -102,6 +113,7 @@ async function main() {
   const { environment } = assertEnvironmentProfile();
   assertCredentials();
   assertCypressBinary();
+  assertReportFolders();
 
   if (environment) {
     const apiBaseUrl = process.env.EVENTHUB_API_BASE_URL || environment.apiBaseUrl;

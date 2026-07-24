@@ -92,3 +92,66 @@ When("I cancel the API-created booking", () => {
 Then("the API booking cancellation should be successful", () => {
   assertBookingCancelled(cancellationResponse);
 });
+
+When("I authenticate through the API with invalid credentials", () => {
+  cy.request({
+    method: "POST",
+    url: `${Cypress.env("apiBaseUrl")}/api/auth/login`,
+    failOnStatusCode: false,
+    body: {
+      email: Cypress.env("userEmail"),
+      password: "DefinitelyWrong@123",
+    },
+  }).then((response) => {
+    apiResponse = response;
+  });
+});
+
+When("I request bookings through the API without authentication", () => {
+  cy.request({
+    method: "GET",
+    url: `${Cypress.env("apiBaseUrl")}/api/bookings`,
+    failOnStatusCode: false,
+  }).then((response) => {
+    apiResponse = response;
+  });
+});
+
+When("I request unknown event detail through the API", () => {
+  eventHubClient.login().then(() => {
+    cy.request({
+      method: "GET",
+      url: `${Cypress.env("apiBaseUrl")}/api/events/999999999`,
+      headers: {
+        Authorization: `Bearer ${eventHubClient.token}`,
+      },
+      failOnStatusCode: false,
+    }).then((response) => {
+      apiResponse = response;
+    });
+  });
+});
+
+When("I create a booking through the API with invalid payload", () => {
+  eventHubClient.login().then(() => {
+    cy.request({
+      method: "POST",
+      url: `${Cypress.env("apiBaseUrl")}/api/bookings`,
+      headers: {
+        Authorization: `Bearer ${eventHubClient.token}`,
+      },
+      failOnStatusCode: false,
+      body: apiBookingPayload({
+        customerEmail: "not-an-email",
+        quantity: 0,
+      }),
+    }).then((response) => {
+      apiResponse = response;
+    });
+  });
+});
+
+Then("the API should reject the request with status {int}", (statusCode) => {
+  expect(apiResponse.status).to.eq(statusCode);
+  expect(apiResponse.body.success).to.not.eq(true);
+});
