@@ -5,7 +5,7 @@ const path = require("path");
 const environments = require("../config/environments.json");
 const packageJson = require("../package.json");
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const checks = [];
 

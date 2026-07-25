@@ -22,6 +22,7 @@
     "test:visual": "env -u ELECTRON_RUN_AS_NODE cypress run --spec 'cypress/e2e/features/visual/*.feature'",
     "cleanup:test-data": "node scripts/cleanup-test-data.js",
     "doctor": "node scripts/doctor.js",
+    "wait:app": "node scripts/wait-for-url.js",
     "report:html": "node scripts/generate-cucumber-html-report.js",
     "report:history": "node scripts/generate-report-history.js",
     "report:combined": "node scripts/generate-combined-report-summary.js",

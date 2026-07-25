@@ -7,7 +7,7 @@ const fs = require("fs");
 const path = require("path");
 const environments = require("./config/environments.json");
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const environmentName = process.env.EVENTHUB_ENV || "qa";
 const environment = environments[environmentName];

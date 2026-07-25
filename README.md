@@ -24,6 +24,7 @@ EVENTHUB_USER_PASSWORD=your_password
 | `npm run cy:open`          | Interactive Cypress runner | Local debugging and authoring                      |
 | `npm run cy:run`           | All feature specs          | Full local execution                               |
 | `npm run doctor`           | Framework health checks    | Validates Node, Cypress, profile, credentials, API |
+| `npm run wait:app`         | UI reachability preflight  | Waits for configured `baseUrl` before Cypress      |
 | `npm run test:smoke`       | `@smoke` scenarios         | Pull request and quick confidence run              |
 | `npm run test:regression`  | `@regression` scenarios    | Broader functional regression                      |
 | `npm run test:auth`        | Auth feature specs         | Login and route-guard checks                       |
@@ -76,6 +77,9 @@ EVENTHUB_API_BASE_URL
 EVENTHUB_USER_EMAIL
 EVENTHUB_USER_PASSWORD
 ```
+
+CI runs `npm run wait:app` before Cypress jobs. This makes EventHub UI reachability an explicit
+preflight gate before Cypress performs its own `baseUrl` availability check.
 
 ## Cleanup Strategy
 

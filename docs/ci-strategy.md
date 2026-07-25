@@ -31,6 +31,10 @@ The workflow uses separate jobs:
 
 ## Cypress Matrix Legs
 
+Every Cypress job runs `npm run wait:app` first. This checks the configured EventHub UI `baseUrl`
+before Cypress starts, so temporary site reachability issues appear as a named preflight gate instead
+of only as Cypress's internal base URL verification retry message.
+
 Smoke runs in both Chrome and Electron. Regression is split by domain:
 
 - `auth-events`

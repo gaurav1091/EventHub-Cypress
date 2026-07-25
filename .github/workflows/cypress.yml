@@ -98,6 +98,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Wait for EventHub UI
+        run: npm run wait:app
+
       - name: Run smoke suite
         run: EVENTHUB_TEST_DATA_NAMESPACE="ci-${{ github.run_id }}-smoke-${{ matrix.name }}" env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@smoke" --browser "${{ matrix.browser }}"
 
@@ -150,6 +153,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Wait for EventHub UI
+        run: npm run wait:app
+
       - name: Run regression suite
         run: EVENTHUB_TEST_DATA_NAMESPACE="ci-${{ github.run_id }}-regression-${{ matrix.name }}" env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@regression" --browser chrome --spec "${{ matrix.spec }}"
 
@@ -189,6 +195,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Wait for EventHub UI
+        run: npm run wait:app
 
       - name: Run accessibility suite
         run: EVENTHUB_TEST_DATA_NAMESPACE="ci-${{ github.run_id }}-accessibility" env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@accessibility" --browser chrome --spec "cypress/e2e/features/accessibility/*.feature"
@@ -231,6 +240,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Wait for EventHub UI
+        run: npm run wait:app
 
       - name: Run visual smoke suite
         run: |
