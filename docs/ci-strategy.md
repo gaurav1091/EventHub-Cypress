@@ -42,6 +42,11 @@ Each leg uploads its own reports, screenshots, and videos. Domain-splitting make
 triage and gives the project a path toward true parallelization if Cypress Cloud or another orchestrator
 is added later.
 
+Visual smoke runs after regression and accessibility instead of alongside them. This keeps the optional
+visual signal lower-noise and avoids adding extra load to the shared EventHub environment while the
+functional gates are still running. The visual command gets one delayed retry for transient base URL
+reachability issues.
+
 `report-summary` downloads all `cypress-reports-*` artifacts and republishes a combined bundle for
 easier run-level review. It also generates `reports/combined/combined-summary.json`, which aggregates
 scenario totals and slowest scenarios across all downloaded matrix artifacts.
