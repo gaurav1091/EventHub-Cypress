@@ -1,4 +1,5 @@
 const timestamp = () => Date.now();
+const testDataNamespace = () => Cypress.env("testDataNamespace") || "local";
 
 export function registeredUser() {
   return {
@@ -9,7 +10,7 @@ export function registeredUser() {
 
 export function bookingCustomer() {
   return {
-    fullName: `Cypress User ${timestamp()}`,
+    fullName: `Cypress User ${testDataNamespace()} ${timestamp()}`,
     email: Cypress.env("userEmail"),
     phone: "+91 98765 43210",
   };
@@ -19,7 +20,7 @@ export function eventPayload(overrides = {}) {
   const id = timestamp();
 
   return {
-    title: `Cypress Summit ${id}`,
+    title: `Cypress ${testDataNamespace()} Summit ${id}`,
     description: "A framework generated event used for Cypress BDD automation practice.",
     category: "Conference",
     city: "Bangalore",

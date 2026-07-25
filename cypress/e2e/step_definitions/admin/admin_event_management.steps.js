@@ -47,9 +47,9 @@ When("I search for the new admin event in discovery", () => {
 
 When("I search and filter for the new admin event in discovery", () => {
   eventsPage.visit();
-  eventsPage.search(currentEvent.title);
   eventsPage.filterByCategory(currentEvent.category);
   eventsPage.filterByCity(currentEvent.city);
+  eventsPage.search(currentEvent.title);
 });
 
 Then("I should see the new admin event in discovery", () => {

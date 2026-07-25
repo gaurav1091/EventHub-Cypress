@@ -85,7 +85,7 @@ export default class EventHubClient {
     return this.bookings.deleteBooking(bookingId);
   }
 
-  cleanupBookingsByCustomerPrefix(prefix = "Cypress User") {
+  cleanupBookingsByCustomerPrefix(prefix = Cypress.env("bookingCleanupPrefix") || "Cypress User") {
     return this.getBookings({ limit: 100 }).then((response) => {
       const bookings = response.body.data || [];
       const matchingBookings = bookings.filter((booking) =>
@@ -98,7 +98,7 @@ export default class EventHubClient {
     });
   }
 
-  cleanupEventsByTitlePrefix(prefix = "Cypress") {
+  cleanupEventsByTitlePrefix(prefix = Cypress.env("eventCleanupPrefix") || "Cypress") {
     return this.getEvents().then((response) => {
       const events = response.body.data || [];
       const matchingEvents = events.filter(

@@ -99,7 +99,7 @@ jobs:
         run: npm ci
 
       - name: Run smoke suite
-        run: env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@smoke" --browser "${{ matrix.browser }}"
+        run: EVENTHUB_TEST_DATA_NAMESPACE="ci-${{ github.run_id }}-smoke-${{ matrix.name }}" env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@smoke" --browser "${{ matrix.browser }}"
 
       - name: Generate Cucumber HTML report
         if: always()
@@ -151,7 +151,7 @@ jobs:
         run: npm ci
 
       - name: Run regression suite
-        run: env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@regression" --browser chrome --spec "${{ matrix.spec }}"
+        run: EVENTHUB_TEST_DATA_NAMESPACE="ci-${{ github.run_id }}-regression-${{ matrix.name }}" env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@regression" --browser chrome --spec "${{ matrix.spec }}"
 
       - name: Generate Cucumber HTML report
         if: always()
@@ -191,7 +191,7 @@ jobs:
         run: npm ci
 
       - name: Run accessibility suite
-        run: env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@accessibility" --browser chrome --spec "cypress/e2e/features/accessibility/*.feature"
+        run: EVENTHUB_TEST_DATA_NAMESPACE="ci-${{ github.run_id }}-accessibility" env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@accessibility" --browser chrome --spec "cypress/e2e/features/accessibility/*.feature"
 
       - name: Generate Cucumber HTML report
         if: always()
@@ -231,7 +231,7 @@ jobs:
         run: npm ci
 
       - name: Run visual smoke suite
-        run: env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@visual" --browser chrome --spec "cypress/e2e/features/visual/*.feature"
+        run: EVENTHUB_TEST_DATA_NAMESPACE="ci-${{ github.run_id }}-visual" env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@visual" --browser chrome --spec "cypress/e2e/features/visual/*.feature"
 
       - name: Compare visual baselines
         if: always()

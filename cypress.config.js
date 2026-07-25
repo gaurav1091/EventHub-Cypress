@@ -12,6 +12,10 @@ dotenv.config();
 const environmentName = process.env.EVENTHUB_ENV || "qa";
 const environment = environments[environmentName];
 const isCi = process.env.CI === "true";
+const testDataNamespace =
+  process.env.EVENTHUB_TEST_DATA_NAMESPACE ||
+  [process.env.GITHUB_RUN_ID, process.env.GITHUB_JOB].filter(Boolean).join("-") ||
+  "local";
 
 if (!environment) {
   throw new Error(
@@ -90,6 +94,10 @@ async function setupNodeEvents(on, config) {
   config.env = {
     ...config.env,
     environmentName,
+    testDataNamespace,
+    bookingCleanupPrefix:
+      process.env.EVENTHUB_BOOKING_CLEANUP_PREFIX || `Cypress User ${testDataNamespace}`,
+    eventCleanupPrefix: process.env.EVENTHUB_EVENT_CLEANUP_PREFIX || `Cypress ${testDataNamespace}`,
     userEmail: process.env.EVENTHUB_USER_EMAIL || config.env.userEmail,
     userPassword: process.env.EVENTHUB_USER_PASSWORD || config.env.userPassword,
   };
