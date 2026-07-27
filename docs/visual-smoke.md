@@ -10,6 +10,12 @@ npm run test:visual
 npm run visual:compare
 ```
 
+To intentionally approve the latest captured screenshots as baselines:
+
+```bash
+npm run visual:approve
+```
+
 Current baseline pages:
 
 - Login.
@@ -36,3 +42,5 @@ Useful environment variables:
 - `EVENTHUB_VISUAL_REQUIRE_BASELINES=true`
 
 When a baseline is intentionally approved, place the matching `.png` in `cypress/visual-baselines`.
+The approval script copies the latest `cypress/screenshots/**/visual/*.png` files into that folder
+using the stable screenshot file names.

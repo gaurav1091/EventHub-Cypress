@@ -26,7 +26,10 @@
     "report:html": "node scripts/generate-cucumber-html-report.js",
     "report:history": "node scripts/generate-report-history.js",
     "report:combined": "node scripts/generate-combined-report-summary.js",
+    "report:github-summary": "node scripts/generate-github-step-summary.js",
     "visual:compare": "node scripts/compare-visual-baselines.js",
+    "visual:approve": "node scripts/approve-visual-baselines.js",
+    "security:audit": "npm audit --audit-level=critical",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

@@ -11,6 +11,8 @@ import {
   assertBookingCancelled,
   assertBookingCreated,
 } from "../../../support/api/assertions/bookingAssertions";
+import { assertApiError } from "../../../support/api/assertions/errorAssertions";
+import { assertHealthResponse } from "../../../support/api/assertions/healthAssertions";
 
 const eventHubClient = new EventHubClient();
 
@@ -26,9 +28,7 @@ When("I request the API health endpoint", () => {
 });
 
 Then("the API health response should be successful", () => {
-  expect(apiResponse.status).to.eq(200);
-  expect(apiResponse.body.status).to.eq("ok");
-  expect(apiResponse.body.dbStatus).to.eq("connected");
+  assertHealthResponse(apiResponse);
 });
 
 When("I authenticate through the API", () => {
@@ -152,6 +152,5 @@ When("I create a booking through the API with invalid payload", () => {
 });
 
 Then("the API should reject the request with status {int}", (statusCode) => {
-  expect(apiResponse.status).to.eq(statusCode);
-  expect(apiResponse.body.success).to.not.eq(true);
+  assertApiError(apiResponse, statusCode);
 });

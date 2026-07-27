@@ -23,6 +23,7 @@ The workflow uses separate jobs:
 
 - `doctor`
 - `lint`
+- `security`
 - `smoke`
 - `regression`
 - `accessibility`
@@ -59,3 +60,7 @@ The report-summary job restores `reports/combined/history.json` from the branch-
 cache before generating the combined summary. `scripts/generate-combined-report-summary.js` appends the
 current run to that history and the cache post-job save makes the updated trend history available to
 the next workflow run on the same branch.
+
+The `security` job runs `npm run security:audit` after dependency installation. The current gate blocks
+critical advisories so CI catches severe supply-chain risk without destabilizing the suite on existing
+moderate/high transitive advisories that need separate upgrade planning.

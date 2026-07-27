@@ -71,9 +71,33 @@ jobs:
       - name: Check formatting
         run: npm run format:check
 
+  security:
+    name: Security Audit
+    needs: doctor
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run critical dependency audit
+        run: npm run security:audit
+
   smoke:
     name: Smoke (${{ matrix.name }})
-    needs: lint
+    needs:
+      - lint
+      - security
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -321,6 +345,10 @@ jobs:
 
       - name: Generate combined report summary
         run: npm run report:combined
+
+      - name: Publish GitHub step summary
+        if: always()
+        run: npm run report:github-summary
 
       - name: Upload combined report bundle
         uses: actions/upload-artifact@v4

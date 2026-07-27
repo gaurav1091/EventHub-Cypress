@@ -31,7 +31,7 @@ EVENTHUB_USER_PASSWORD=your_password
 | `npm run test:events`      | Events feature specs       | Discovery, search, and filtering checks            |
 | `npm run test:bookings`    | Booking feature specs      | Booking lifecycle and validation checks            |
 | `npm run test:admin`       | Admin feature specs        | Event management checks                            |
-| `npm run test:api`         | API feature specs          | API smoke and support-client checks                |
+| `npm run test:api`         | API feature specs          | API contract and support-client checks             |
 | `npm run test:hybrid`      | Hybrid feature specs       | API-created data verified through the UI           |
 | `npm run test:a11y`        | Accessibility specs        | Axe serious/critical accessibility smoke           |
 | `npm run test:visual`      | Visual smoke specs         | Captures baseline screenshots for core pages       |
@@ -41,7 +41,9 @@ EVENTHUB_USER_PASSWORD=your_password
 | `npm run report:html`      | Cucumber messages to HTML  | Generates `reports/cucumber/cucumber-report.html`  |
 | `npm run report:history`   | Report history summary     | Generates status, duration, and slowest-test data  |
 | `npm run report:combined`  | Combined CI report summary | Aggregates downloaded matrix report artifacts      |
+| `npm run security:audit`   | Dependency audit           | Fails on critical npm advisories                   |
 | `npm run visual:compare`   | Visual comparison          | Compares screenshots to approved baselines         |
+| `npm run visual:approve`   | Visual baseline approval   | Promotes latest visual screenshots to baselines    |
 
 Current verified suites:
 
@@ -135,7 +137,7 @@ run-level trends can persist across workflow runs on the same branch.
 - Test data lifecycle is documented in `docs/test-data-management.md`.
 - Visual smoke baselines are documented in `docs/visual-smoke.md`.
 - Cypress retries run only in CI; local run mode stays retry-free for faster failure feedback.
-- GitHub Actions runs separate doctor, lint, smoke, regression, accessibility, visual, and report-summary jobs.
+- GitHub Actions runs separate doctor, lint, security, smoke, regression, accessibility, visual, and report-summary jobs.
 - Accessibility smoke uses axe and fails on serious or critical violations.
 - Report history writes scenario status, duration, previous-result metadata, and slowest scenarios to `reports/history/latest-summary.json`.
 - API contracts are validated with JSON Schema through AJV.

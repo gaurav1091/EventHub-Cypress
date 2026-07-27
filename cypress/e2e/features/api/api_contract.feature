@@ -1,5 +1,5 @@
 @api
-Feature: EventHub API smoke
+Feature: EventHub API contract
 
   @smoke
   Scenario: API health endpoint is available
