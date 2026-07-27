@@ -523,7 +523,7 @@ jobs:
   deploy-report-dashboard:
     name: Deploy Report Dashboard
     needs: report-summary
-    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && needs.report-summary.result == 'success' && (github.event_name != 'workflow_dispatch' || inputs.publish_report == 'true') }}
+    if: ${{ always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && needs['report-summary'].result == 'success' && (github.event_name != 'workflow_dispatch' || inputs.publish_report == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment:
