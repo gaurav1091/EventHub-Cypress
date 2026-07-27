@@ -205,6 +205,11 @@ jobs:
       - name: Run Docker smoke suite
         run: npm run docker:smoke
 
+      - name: Normalize Docker artifact permissions
+        if: always()
+        run: |
+          sudo chown -R "$USER:$USER" reports cypress/screenshots cypress/videos cypress/downloads || true
+
       - name: Generate Docker report history summary
         if: always()
         run: npm run report:history
