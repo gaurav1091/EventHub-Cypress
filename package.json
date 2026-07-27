@@ -29,6 +29,7 @@
     "report:combined": "node scripts/generate-combined-report-summary.js",
     "report:dashboard": "node scripts/generate-combined-html-dashboard.js",
     "report:github-summary": "node scripts/generate-github-step-summary.js",
+    "report:pr-comment": "node scripts/generate-pr-report-comment.js",
     "visual:compare": "node scripts/compare-visual-baselines.js",
     "visual:approve": "node scripts/approve-visual-baselines.js",
     "security:audit": "npm audit --audit-level=critical",

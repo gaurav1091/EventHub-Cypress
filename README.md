@@ -121,6 +121,7 @@ reports/history/history.json
 reports/combined/combined-summary.json
 reports/combined/history.json
 reports/combined/index.html
+reports/combined/pr-comment.md
 reports/test-data-registry.json
 ```
 
@@ -134,6 +135,8 @@ run-level trends can persist across workflow runs on the same branch. The same j
 scenarios, and recent run history from the uploaded combined artifact. On trusted `main` runs, CI also
 publishes that dashboard through GitHub Pages when Pages is configured for GitHub Actions. Published
 dashboards are stored under unique run-attempt paths and copied to `latest/`.
+Pull request runs do not publish Pages, but CI updates a sticky PR comment with the combined totals and
+the `cypress-reports-combined` artifact reference.
 
 ## Enterprise Conventions
 

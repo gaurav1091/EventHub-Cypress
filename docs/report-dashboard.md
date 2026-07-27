@@ -29,7 +29,8 @@ reports/combined/index.html
 
 On trusted `main` workflow runs, GitHub Actions publishes `reports/combined` through GitHub Pages.
 Pull request runs do not publish pages because they may come from untrusted branches; they still upload
-the combined report bundle as a workflow artifact.
+the combined report bundle as a workflow artifact and update a sticky PR comment with the combined
+result summary.
 
 Repository setup required:
 
@@ -63,3 +64,15 @@ The static dashboard shows:
 
 The dashboard is generated from JSON files only. It does not require a server, database, or external
 reporting service.
+
+## Pull Request Comments
+
+Pull request runs generate:
+
+```text
+reports/combined/pr-comment.md
+```
+
+The `report-summary` job uses `actions/github-script` to create or update one sticky PR comment marked
+with `<!-- eventhub-cypress-report -->`. The comment includes run selection metadata, scenario totals,
+failed scenarios, slowest scenarios, and a pointer to the `cypress-reports-combined` artifact.

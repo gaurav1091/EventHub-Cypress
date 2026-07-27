@@ -68,6 +68,9 @@ Manual `workflow_dispatch` runs expose suite, smoke browser, environment, and pu
 Published dashboards are written to `runs/<run_id>-<run_attempt>/` and copied to `latest/`, so a
 manual report link preserves the exact run attempt that produced its totals.
 
+Pull request runs also generate `reports/combined/pr-comment.md` and upsert one sticky PR comment with
+the combined totals, failed scenarios, slowest scenarios, and artifact reference.
+
 The report-summary job restores `reports/combined/history.json` from the branch-level GitHub Actions
 cache before generating the combined summary. `scripts/generate-combined-report-summary.js` appends the
 current run to that history and the cache post-job save makes the updated trend history available to
