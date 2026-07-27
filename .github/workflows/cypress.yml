@@ -369,7 +369,7 @@ jobs:
             eventhub-combined-history-${{ github.ref_name }}-
 
       - name: Download report artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: cypress-*
           path: combined-artifacts
