@@ -6,10 +6,19 @@ Feature: EventHub API contract
     When I request the API health endpoint
     Then the API health response should be successful
 
+  @regression
+  Scenario: Internal API contract manifest documents automated endpoints
+    Then the internal API contract should document the automated endpoints
+
   @smoke
   Scenario: Registered user can authenticate through API
     When I authenticate through the API
     Then the API should return the registered user identity
+
+  @regression
+  Scenario: Authenticated user can retrieve current user profile through API
+    When I request the current user profile through the API
+    Then the API current user response should include the registered identity
 
   @smoke
   Scenario: Authenticated user can list events through API
@@ -39,8 +48,18 @@ Feature: EventHub API contract
     Then the API should reject the request with status 401
 
   @regression @negative
+  Scenario: Anonymous user cannot create a booking through API
+    When I create a booking through the API without authentication
+    Then the API should reject the request with status 401
+
+  @regression @negative
   Scenario: Unknown event detail request returns not found
     When I request unknown event detail through the API
+    Then the API should reject the request with status 404
+
+  @regression @negative
+  Scenario: Unknown booking cancellation returns not found
+    When I cancel an unknown booking through the API
     Then the API should reject the request with status 404
 
   @regression @negative

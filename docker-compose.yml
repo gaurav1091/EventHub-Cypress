@@ -5,12 +5,15 @@ services:
       dockerfile: Dockerfile
     image: eventhub-cypress-framework:latest
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       CI: "true"
       EVENTHUB_ENV: "${EVENTHUB_ENV:-qa}"
       EVENTHUB_BASE_URL: "${EVENTHUB_BASE_URL:-https://eventhub.rahulshettyacademy.com}"
       EVENTHUB_API_BASE_URL: "${EVENTHUB_API_BASE_URL:-https://api.eventhub.rahulshettyacademy.com}"
+      EVENTHUB_USER_EMAIL: "${EVENTHUB_USER_EMAIL:-}"
+      EVENTHUB_USER_PASSWORD: "${EVENTHUB_USER_PASSWORD:-}"
       EVENTHUB_TEST_DATA_NAMESPACE: "${EVENTHUB_TEST_DATA_NAMESPACE:-docker-local}"
     volumes:
       - ./reports:/app/reports

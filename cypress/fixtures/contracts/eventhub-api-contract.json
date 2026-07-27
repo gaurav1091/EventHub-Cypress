@@ -1,0 +1,87 @@
+{
+  "name": "EventHub Internal API Contract",
+  "version": "1.0.0",
+  "basePath": "/api",
+  "description": "Consumer-owned contract used when a provider OpenAPI specification is not available.",
+  "operations": [
+    {
+      "operationId": "getHealth",
+      "method": "GET",
+      "path": "/api/health",
+      "auth": false,
+      "successStatus": 200,
+      "responseSchema": "healthSchema"
+    },
+    {
+      "operationId": "login",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "auth": false,
+      "successStatus": 200,
+      "errorStatuses": [400],
+      "responseSchema": "authLoginSchema"
+    },
+    {
+      "operationId": "getCurrentUser",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "auth": true,
+      "successStatus": 200,
+      "errorStatuses": [401],
+      "responseSchema": "currentUser"
+    },
+    {
+      "operationId": "listEvents",
+      "method": "GET",
+      "path": "/api/events",
+      "auth": true,
+      "successStatus": 200,
+      "responseSchema": "eventList"
+    },
+    {
+      "operationId": "getEvent",
+      "method": "GET",
+      "path": "/api/events/{eventId}",
+      "auth": true,
+      "successStatus": 200,
+      "errorStatuses": [404],
+      "responseSchema": "eventDetail"
+    },
+    {
+      "operationId": "createEvent",
+      "method": "POST",
+      "path": "/api/events",
+      "auth": true,
+      "successStatus": 201,
+      "errorStatuses": [400, 401],
+      "responseSchema": "eventDetail"
+    },
+    {
+      "operationId": "listBookings",
+      "method": "GET",
+      "path": "/api/bookings",
+      "auth": true,
+      "successStatus": 200,
+      "errorStatuses": [401],
+      "responseSchema": "bookingList"
+    },
+    {
+      "operationId": "createBooking",
+      "method": "POST",
+      "path": "/api/bookings",
+      "auth": true,
+      "successStatus": 201,
+      "errorStatuses": [400, 401],
+      "responseSchema": "bookingDetail"
+    },
+    {
+      "operationId": "deleteBooking",
+      "method": "DELETE",
+      "path": "/api/bookings/{bookingId}",
+      "auth": true,
+      "successStatus": 200,
+      "errorStatuses": [401, 404],
+      "responseSchema": "deleteResult"
+    }
+  ]
+}

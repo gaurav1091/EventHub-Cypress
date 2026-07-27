@@ -32,3 +32,5 @@
 - Accessibility smoke checks.
 - Visual smoke checks for login, events, booking, and admin pages.
 - Flakiness dashboard from report history.
+- Provider-owned OpenAPI contract validation if EventHub exposes a stable OpenAPI specification.
+- Rich visual-diff PR comments if screenshot review volume grows.

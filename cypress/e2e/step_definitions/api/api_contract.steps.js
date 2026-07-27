@@ -13,6 +13,10 @@ import {
 } from "../../../support/api/assertions/bookingAssertions";
 import { assertApiError } from "../../../support/api/assertions/errorAssertions";
 import { assertHealthResponse } from "../../../support/api/assertions/healthAssertions";
+import {
+  assertContractIsDocumented,
+  assertResponseMatchesContract,
+} from "../../../support/api/assertions/contractAssertions";
 
 const eventHubClient = new EventHubClient();
 
@@ -28,7 +32,12 @@ When("I request the API health endpoint", () => {
 });
 
 Then("the API health response should be successful", () => {
+  assertResponseMatchesContract(apiResponse, "getHealth");
   assertHealthResponse(apiResponse);
+});
+
+Then("the internal API contract should document the automated endpoints", () => {
+  assertContractIsDocumented();
 });
 
 When("I authenticate through the API", () => {
@@ -38,7 +47,21 @@ When("I authenticate through the API", () => {
 });
 
 Then("the API should return the registered user identity", () => {
+  assertResponseMatchesContract({ status: 200 }, "login");
   assertSuccessfulLogin(apiResponse.body);
+});
+
+When("I request the current user profile through the API", () => {
+  eventHubClient.login().then(() => {
+    eventHubClient.getCurrentUser().then((response) => {
+      apiResponse = response;
+    });
+  });
+});
+
+Then("the API current user response should include the registered identity", () => {
+  assertResponseMatchesContract(apiResponse, "getCurrentUser");
+  expect(JSON.stringify(apiResponse.body)).to.include(Cypress.env("userEmail"));
 });
 
 When("I request events through the API", () => {
@@ -50,6 +73,7 @@ When("I request events through the API", () => {
 });
 
 Then("the API events response should include seeded EventHub events", () => {
+  assertResponseMatchesContract(apiResponse, "listEvents");
   assertEventsResponse(apiResponse);
   assertSeededEventsPresent(apiResponse.body.data);
 });
@@ -67,6 +91,7 @@ When("I request event {string} through the API", (eventName) => {
 });
 
 Then("the API event detail response should describe {string}", (eventName) => {
+  assertResponseMatchesContract(apiResponse, "getEvent");
   assertEventDetail(apiResponse, eventName);
 });
 
@@ -80,6 +105,7 @@ When("I create a booking through the API", () => {
 });
 
 Then("the API booking response should include a booking reference", () => {
+  assertResponseMatchesContract(apiResponse, "createBooking");
   assertBookingCreated(apiResponse);
 });
 
@@ -90,6 +116,7 @@ When("I cancel the API-created booking", () => {
 });
 
 Then("the API booking cancellation should be successful", () => {
+  assertResponseMatchesContract(cancellationResponse, "deleteBooking");
   assertBookingCancelled(cancellationResponse);
 });
 
@@ -117,11 +144,37 @@ When("I request bookings through the API without authentication", () => {
   });
 });
 
+When("I create a booking through the API without authentication", () => {
+  cy.request({
+    method: "POST",
+    url: `${Cypress.env("apiBaseUrl")}/api/bookings`,
+    failOnStatusCode: false,
+    body: apiBookingPayload(),
+  }).then((response) => {
+    apiResponse = response;
+  });
+});
+
 When("I request unknown event detail through the API", () => {
   eventHubClient.login().then(() => {
     cy.request({
       method: "GET",
       url: `${Cypress.env("apiBaseUrl")}/api/events/999999999`,
+      headers: {
+        Authorization: `Bearer ${eventHubClient.token}`,
+      },
+      failOnStatusCode: false,
+    }).then((response) => {
+      apiResponse = response;
+    });
+  });
+});
+
+When("I cancel an unknown booking through the API", () => {
+  eventHubClient.login().then(() => {
+    cy.request({
+      method: "DELETE",
+      url: `${Cypress.env("apiBaseUrl")}/api/bookings/999999999`,
       headers: {
         Authorization: `Bearer ${eventHubClient.token}`,
       },

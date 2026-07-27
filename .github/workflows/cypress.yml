@@ -102,6 +102,9 @@ jobs:
       - name: Run framework doctor
         run: npm run doctor
 
+      - name: Run framework governance doctor
+        run: npm run doctor:framework
+
   lint:
     name: Lint
     needs: doctor
@@ -187,6 +190,35 @@ jobs:
       - name: Run critical dependency audit
         run: npm run security:audit
 
+  docker-smoke:
+    name: Docker Smoke
+    needs: doctor
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Cypress Docker image
+        run: npm run docker:build
+
+      - name: Run Docker smoke suite
+        run: npm run docker:smoke
+
+      - name: Generate Docker report history summary
+        if: always()
+        run: npm run report:history
+
+      - name: Upload Docker smoke reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-reports-docker-smoke
+          path: |
+            reports
+            cypress/screenshots
+            cypress/videos
+
   smoke:
     name: Smoke (${{ matrix.name }})
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.suite == 'all' || inputs.suite == 'smoke' }}
@@ -194,6 +226,7 @@ jobs:
       - lint
       - impact
       - security
+      - docker-smoke
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -462,6 +495,10 @@ jobs:
         if: always()
         run: npm run report:github-summary
 
+      - name: Generate framework inventory
+        if: always()
+        run: npm run framework:inventory
+
       - name: Generate PR report comment
         if: ${{ github.event_name == 'pull_request' }}
         run: npm run report:pr-comment
@@ -507,6 +544,8 @@ jobs:
           path: |
             combined-artifacts
             reports/combined
+            reports/framework-inventory.json
+            reports/framework-inventory.md
 
       - name: Restore published dashboard site
         if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}

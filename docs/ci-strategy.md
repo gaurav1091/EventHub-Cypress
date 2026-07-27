@@ -25,6 +25,7 @@ The workflow uses separate jobs:
 - `lint`
 - `impact`
 - `security`
+- `docker-smoke`
 - `smoke`
 - `regression`
 - `accessibility`
@@ -79,6 +80,10 @@ the next workflow run on the same branch.
 The `security` job runs `npm run security:audit` after dependency installation. The current gate blocks
 critical advisories so CI catches severe supply-chain risk without destabilizing the suite on existing
 moderate/high transitive advisories that need separate upgrade planning.
+
+The `docker-smoke` job builds the Cypress Docker image and runs the smoke suite through Docker Compose.
+This proves that the framework can run from a clean container image and not only from a prepared local
+or GitHub-hosted Node environment.
 
 The `impact` job runs `npm run impact:list` and uploads `reports/impact/impact-summary.json`. The
 analysis maps changed files to regression domains. Pull request workflows use that output to run only

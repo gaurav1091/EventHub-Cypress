@@ -53,6 +53,10 @@ Page objects own locators, navigation, and page-level assertions. Selector strat
 API assertions use JSON Schema validation through AJV, plus focused business assertions for values such
 as seeded events, booking references, quantity, and valid event dates.
 
+When a provider-owned OpenAPI document is unavailable, `cypress/fixtures/contracts/eventhub-api-contract.json`
+serves as the internal consumer-owned API contract. API scenarios assert operation metadata through the
+contract helper and response bodies through the schema assertion layer.
+
 ## Data Layer
 
 Stateful tests create data through factories and API/client helpers. Created bookings and events are
@@ -72,6 +76,9 @@ Each Cypress run writes:
 CI also generates `reports/combined/combined-summary.json` from downloaded matrix artifacts.
 `reports/combined/index.html` is generated from the combined JSON as a static run dashboard for
 reviewing totals, failures, slowest scenarios, and recent trend history.
+`npm run framework:inventory` generates `reports/framework-inventory.json` and
+`reports/framework-inventory.md` for audit visibility across suites, features, scenarios, page objects,
+API support files, and docs.
 
 ## CI Layer
 

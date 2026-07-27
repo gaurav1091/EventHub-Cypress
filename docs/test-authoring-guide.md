@@ -55,3 +55,22 @@ API tests should validate:
 - Business constraints.
 
 Negative API cases should be safe and should not create persistent state.
+
+When adding or changing API coverage:
+
+- Add or update the operation in `cypress/fixtures/contracts/eventhub-api-contract.json`.
+- Add or update the matching schema under `cypress/support/api/schemas/`.
+- Assert the operation with `assertResponseMatchesContract`.
+- Prefer unauthenticated requests, invalid payloads, and unknown IDs for negative testing.
+
+## Governance Checks
+
+Run these before opening a PR for framework-level changes:
+
+```bash
+npm run doctor:framework
+npm run framework:inventory
+```
+
+The governance doctor catches missing docs, missing scripts, duplicate scenario names, missing tags,
+contract drift, and cleanup hook drift.

@@ -1,0 +1,66 @@
+{
+  "version": "1.0.0",
+  "suites": [
+    {
+      "name": "smoke",
+      "description": "Fast cross-domain confidence suite for pull requests and quick checks.",
+      "tags": ["@smoke"],
+      "risk": "critical",
+      "ciBehavior": "always-on gate"
+    },
+    {
+      "name": "auth-events",
+      "description": "Authentication, route guards, event discovery, search, and filtering.",
+      "domains": ["auth", "events"],
+      "specs": ["cypress/e2e/features/auth/*.feature", "cypress/e2e/features/events/*.feature"],
+      "tags": ["@regression", "@ui"],
+      "risk": "high",
+      "ciBehavior": "pull-request impact domain"
+    },
+    {
+      "name": "bookings",
+      "description": "Booking form validation, booking creation, booking details, and cancellation.",
+      "domains": ["bookings"],
+      "specs": ["cypress/e2e/features/bookings/*.feature"],
+      "tags": ["@regression", "@ui", "@stateful"],
+      "risk": "high",
+      "ciBehavior": "pull-request impact domain"
+    },
+    {
+      "name": "admin",
+      "description": "Admin event creation, validation, discovery integration, and limits.",
+      "domains": ["admin"],
+      "specs": ["cypress/e2e/features/admin/*.feature"],
+      "tags": ["@regression", "@ui", "@admin", "@stateful"],
+      "risk": "high",
+      "ciBehavior": "pull-request impact domain"
+    },
+    {
+      "name": "api-hybrid",
+      "description": "API contracts, API cleanup helpers, and API-created data verified through UI.",
+      "domains": ["api", "hybrid"],
+      "specs": ["cypress/e2e/features/api/*.feature", "cypress/e2e/features/hybrid/*.feature"],
+      "tags": ["@regression", "@api", "@hybrid"],
+      "risk": "high",
+      "ciBehavior": "pull-request impact domain"
+    },
+    {
+      "name": "accessibility",
+      "description": "Serious and critical accessibility smoke checks.",
+      "domains": ["accessibility"],
+      "specs": ["cypress/e2e/features/accessibility/*.feature"],
+      "tags": ["@accessibility", "@ui"],
+      "risk": "medium",
+      "ciBehavior": "pull-request impact domain"
+    },
+    {
+      "name": "visual",
+      "description": "Low-noise screenshot baselines for core pages and confirmation flows.",
+      "domains": ["visual"],
+      "specs": ["cypress/e2e/features/visual/*.feature"],
+      "tags": ["@visual", "@ui"],
+      "risk": "medium",
+      "ciBehavior": "post-regression quality signal"
+    }
+  ]
+}

@@ -23,6 +23,8 @@ npm run docker:smoke
 
 This runs `npm run test:smoke` inside the container.
 
+GitHub Actions also runs this path in the `Docker Smoke` job to prove containerized execution.
+
 ## Run Targeted Suites
 
 ```bash
