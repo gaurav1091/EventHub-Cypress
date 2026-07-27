@@ -435,7 +435,7 @@ jobs:
         run: npm ci
 
       - name: Restore combined report history
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: reports/combined/history.json
           key: eventhub-combined-history-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -471,7 +471,7 @@ jobs:
 
       - name: Restore published dashboard site
         if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: site
           key: eventhub-dashboard-site-${{ github.run_id }}-${{ github.run_attempt }}
@@ -505,7 +505,7 @@ jobs:
 
       - name: Save published dashboard site
         if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: site
           key: eventhub-dashboard-site-${{ github.run_id }}-${{ github.run_attempt }}
