@@ -380,6 +380,9 @@ jobs:
       - name: Generate combined report summary
         run: npm run report:combined
 
+      - name: Generate combined HTML dashboard
+        run: npm run report:dashboard
+
       - name: Publish GitHub step summary
         if: always()
         run: npm run report:github-summary

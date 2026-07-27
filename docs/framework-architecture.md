@@ -70,6 +70,8 @@ Each Cypress run writes:
 - `reports/history/history.json`
 
 CI also generates `reports/combined/combined-summary.json` from downloaded matrix artifacts.
+`reports/combined/index.html` is generated from the combined JSON as a static run dashboard for
+reviewing totals, failures, slowest scenarios, and recent trend history.
 
 ## CI Layer
 

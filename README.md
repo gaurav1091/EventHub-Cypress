@@ -42,6 +42,7 @@ EVENTHUB_USER_PASSWORD=your_password
 | `npm run report:html`      | Cucumber messages to HTML  | Generates `reports/cucumber/cucumber-report.html`  |
 | `npm run report:history`   | Report history summary     | Generates status, duration, and slowest-test data  |
 | `npm run report:combined`  | Combined CI report summary | Aggregates downloaded matrix report artifacts      |
+| `npm run report:dashboard` | Combined HTML dashboard    | Generates `reports/combined/index.html`            |
 | `npm run security:audit`   | Dependency audit           | Fails on critical npm advisories                   |
 | `npm run visual:compare`   | Visual comparison          | Compares screenshots to approved baselines         |
 | `npm run visual:approve`   | Visual baseline approval   | Promotes latest visual screenshots to baselines    |
@@ -114,6 +115,7 @@ reports/history/latest-summary.json
 reports/history/history.json
 reports/combined/combined-summary.json
 reports/combined/history.json
+reports/combined/index.html
 reports/test-data-registry.json
 ```
 
@@ -122,7 +124,9 @@ also runs this step with `if: always()` so failed test runs still upload the ava
 Run `npm run report:history` to generate machine-readable latest and persistent trend summaries with
 scenario duration, previous-status metadata, and slowest-scenario details.
 In CI, the report-summary job also restores and updates `reports/combined/history.json` so combined
-run-level trends can persist across workflow runs on the same branch.
+run-level trends can persist across workflow runs on the same branch. The same job generates
+`reports/combined/index.html`, a static dashboard for reviewing job totals, failures, slowest
+scenarios, and recent run history from the uploaded combined artifact.
 
 ## Enterprise Conventions
 
