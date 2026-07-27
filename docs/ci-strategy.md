@@ -54,3 +54,8 @@ reachability issues.
 `report-summary` downloads all `cypress-reports-*` artifacts and republishes a combined bundle for
 easier run-level review. It also generates `reports/combined/combined-summary.json`, which aggregates
 scenario totals and slowest scenarios across all downloaded matrix artifacts.
+
+The report-summary job restores `reports/combined/history.json` from the branch-level GitHub Actions
+cache before generating the combined summary. `scripts/generate-combined-report-summary.js` appends the
+current run to that history and the cache post-job save makes the updated trend history available to
+the next workflow run on the same branch.

@@ -110,6 +110,7 @@ reports/cucumber/cucumber-report.html
 reports/history/latest-summary.json
 reports/history/history.json
 reports/combined/combined-summary.json
+reports/combined/history.json
 reports/test-data-registry.json
 ```
 
@@ -117,6 +118,8 @@ Run `npm run report:html` after a Cypress run to generate the HTML report locall
 also runs this step with `if: always()` so failed test runs still upload the available report assets.
 Run `npm run report:history` to generate machine-readable latest and persistent trend summaries with
 scenario duration, previous-status metadata, and slowest-scenario details.
+In CI, the report-summary job also restores and updates `reports/combined/history.json` so combined
+run-level trends can persist across workflow runs on the same branch.
 
 ## Enterprise Conventions
 
