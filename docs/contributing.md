@@ -10,6 +10,7 @@ Before opening a pull request, run:
 npm run doctor
 npm run lint
 npm run format:check
+npm run security:audit
 npm run test:smoke
 ```
 
@@ -42,3 +43,4 @@ npm run test:visual
 - API assertions validate contract shape, not only status codes.
 - New page interactions belong in page objects.
 - CI impact is understood before adding new broad regression coverage.
+- Dependency changes follow `docs/dependency-governance.md`.

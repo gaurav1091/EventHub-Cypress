@@ -44,3 +44,13 @@ Useful environment variables:
 When a baseline is intentionally approved, place the matching `.png` in `cypress/visual-baselines`.
 The approval script copies the latest `cypress/screenshots/**/visual/*.png` files into that folder
 using the stable screenshot file names.
+
+## Approval Workflow
+
+Visual baselines should change only when the UI change is intentional.
+
+1. Run `npm run test:visual`.
+2. Run `npm run visual:compare`.
+3. Review screenshots and any files in `reports/visual-diffs`.
+4. Run `npm run visual:approve` only after the visual change is accepted.
+5. Mention the accepted visual change in the pull request checklist.

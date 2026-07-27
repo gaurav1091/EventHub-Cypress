@@ -25,6 +25,7 @@ EVENTHUB_USER_PASSWORD=your_password
 | `npm run cy:run`           | All feature specs          | Full local execution                               |
 | `npm run doctor`           | Framework health checks    | Validates Node, Cypress, profile, credentials, API |
 | `npm run wait:app`         | UI reachability preflight  | Waits for configured `baseUrl` before Cypress      |
+| `npm run impact:list`      | Test impact analysis       | Maps changed files to impacted regression domains  |
 | `npm run test:smoke`       | `@smoke` scenarios         | Pull request and quick confidence run              |
 | `npm run test:regression`  | `@regression` scenarios    | Broader functional regression                      |
 | `npm run test:auth`        | Auth feature specs         | Login and route-guard checks                       |
@@ -130,14 +131,16 @@ run-level trends can persist across workflow runs on the same branch.
 - Selector policy is documented in `docs/selector-strategy.md`.
 - Accessibility policy is documented in `docs/accessibility.md`.
 - CI matrix strategy is documented in `docs/ci-strategy.md`.
+- Dependency governance is documented in `docs/dependency-governance.md`.
 - Framework architecture is documented in `docs/framework-architecture.md`.
 - Contribution standards are documented in `docs/contributing.md`.
 - BDD authoring standards are documented in `docs/test-authoring-guide.md`.
 - Tagging standards are documented in `docs/tagging-strategy.md`.
+- Test impact strategy is documented in `docs/test-impact-strategy.md`.
 - Test data lifecycle is documented in `docs/test-data-management.md`.
 - Visual smoke baselines are documented in `docs/visual-smoke.md`.
 - Cypress retries run only in CI; local run mode stays retry-free for faster failure feedback.
-- GitHub Actions runs separate doctor, lint, security, smoke, regression, accessibility, visual, and report-summary jobs.
+- GitHub Actions runs separate doctor, lint, impact, security, smoke, regression, accessibility, visual, and report-summary jobs.
 - Accessibility smoke uses axe and fails on serious or critical violations.
 - Report history writes scenario status, duration, previous-result metadata, and slowest scenarios to `reports/history/latest-summary.json`.
 - API contracts are validated with JSON Schema through AJV.

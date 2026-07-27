@@ -71,6 +71,39 @@ jobs:
       - name: Check formatting
         run: npm run format:check
 
+  impact:
+    name: Impact Analysis
+    needs: doctor
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Determine impacted tests
+        env:
+          EVENTHUB_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          EVENTHUB_HEAD_SHA: ${{ github.sha }}
+        run: npm run impact:list
+
+      - name: Upload impact report
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-impact-analysis
+          path: reports/impact
+
   security:
     name: Security Audit
     needs: doctor
@@ -97,6 +130,7 @@ jobs:
     name: Smoke (${{ matrix.name }})
     needs:
       - lint
+      - impact
       - security
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -337,7 +371,7 @@ jobs:
       - name: Download report artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: cypress-reports-*
+          pattern: cypress-*
           path: combined-artifacts
 
       - name: List report artifacts

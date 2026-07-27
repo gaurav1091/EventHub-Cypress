@@ -1,0 +1,41 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+      timezone: Asia/Kolkata
+    open-pull-requests-limit: 5
+    groups:
+      cypress-tooling:
+        patterns:
+          - cypress
+          - "@badeball/*"
+          - "@bahmutov/*"
+          - cypress-axe
+      quality-tooling:
+        patterns:
+          - eslint
+          - eslint-*
+          - prettier
+          - ajv
+          - axe-core
+          - pixelmatch
+          - pngjs
+    commit-message:
+      prefix: deps
+      include: scope
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:30"
+      timezone: Asia/Kolkata
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: ci
+      include: scope

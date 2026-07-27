@@ -28,6 +28,16 @@ In GitHub Actions, each Cypress matrix leg receives a unique `EVENTHUB_TEST_DATA
 parallel jobs from deleting each other's generated bookings or admin events while still allowing prefix
 fallback cleanup inside the same job.
 
+Generated booking names and admin event titles include:
+
+- The CI/local namespace.
+- A sanitized scenario slug.
+- A timestamp.
+- A per-process sequence number.
+
+This makes generated records easier to trace in the application while reducing collisions during
+parallel CI execution.
+
 ## Manual Cleanup
 
 Run:

@@ -23,6 +23,7 @@ The workflow uses separate jobs:
 
 - `doctor`
 - `lint`
+- `impact`
 - `security`
 - `smoke`
 - `regression`
@@ -64,3 +65,8 @@ the next workflow run on the same branch.
 The `security` job runs `npm run security:audit` after dependency installation. The current gate blocks
 critical advisories so CI catches severe supply-chain risk without destabilizing the suite on existing
 moderate/high transitive advisories that need separate upgrade planning.
+
+The `impact` job runs `npm run impact:list` and uploads `reports/impact/impact-summary.json`. The
+analysis maps changed files to regression domains and is currently advisory; the full smoke and
+regression gates continue to run while the framework builds enough trend history to safely skip
+non-impacted domains in future pull-request workflows.
