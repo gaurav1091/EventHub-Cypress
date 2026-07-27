@@ -1,0 +1,83 @@
+services:
+  eventhub-cypress:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: eventhub-cypress-framework:latest
+    env_file:
+      - .env
+    environment:
+      CI: "true"
+      EVENTHUB_ENV: "${EVENTHUB_ENV:-qa}"
+      EVENTHUB_BASE_URL: "${EVENTHUB_BASE_URL:-https://eventhub.rahulshettyacademy.com}"
+      EVENTHUB_API_BASE_URL: "${EVENTHUB_API_BASE_URL:-https://api.eventhub.rahulshettyacademy.com}"
+      EVENTHUB_TEST_DATA_NAMESPACE: "${EVENTHUB_TEST_DATA_NAMESPACE:-docker-local}"
+    volumes:
+      - ./reports:/app/reports
+      - ./cypress/screenshots:/app/cypress/screenshots
+      - ./cypress/videos:/app/cypress/videos
+      - ./cypress/downloads:/app/cypress/downloads
+    command: npm run test:smoke
+
+  eventhub-cypress-regression:
+    extends:
+      service: eventhub-cypress
+    profiles:
+      - regression
+    command: npm run test:regression
+
+  eventhub-cypress-auth-events:
+    extends:
+      service: eventhub-cypress
+    profiles:
+      - domains
+    command: npm run test:auth
+
+  eventhub-cypress-events:
+    extends:
+      service: eventhub-cypress
+    profiles:
+      - domains
+    command: npm run test:events
+
+  eventhub-cypress-bookings:
+    extends:
+      service: eventhub-cypress
+    profiles:
+      - domains
+    command: npm run test:bookings
+
+  eventhub-cypress-admin:
+    extends:
+      service: eventhub-cypress
+    profiles:
+      - domains
+    command: npm run test:admin
+
+  eventhub-cypress-api:
+    extends:
+      service: eventhub-cypress
+    profiles:
+      - api
+    command: npm run test:api
+
+  eventhub-cypress-hybrid:
+    extends:
+      service: eventhub-cypress
+    profiles:
+      - api
+    command: npm run test:hybrid
+
+  eventhub-cypress-accessibility:
+    extends:
+      service: eventhub-cypress
+    profiles:
+      - quality
+    command: npm run test:a11y
+
+  eventhub-cypress-visual:
+    extends:
+      service: eventhub-cypress
+    profiles:
+      - quality
+    command: npm run test:visual

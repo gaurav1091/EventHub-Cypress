@@ -19,33 +19,36 @@ EVENTHUB_USER_PASSWORD=your_password
 
 ## Run Tests
 
-| Command                    | Scope                      | Typical use                                        |
-| -------------------------- | -------------------------- | -------------------------------------------------- |
-| `npm run cy:open`          | Interactive Cypress runner | Local debugging and authoring                      |
-| `npm run cy:run`           | All feature specs          | Full local execution                               |
-| `npm run doctor`           | Framework health checks    | Validates Node, Cypress, profile, credentials, API |
-| `npm run wait:app`         | UI reachability preflight  | Waits for configured `baseUrl` before Cypress      |
-| `npm run impact:list`      | Test impact analysis       | Maps changed files to impacted regression domains  |
-| `npm run test:smoke`       | `@smoke` scenarios         | Pull request and quick confidence run              |
-| `npm run test:regression`  | `@regression` scenarios    | Broader functional regression                      |
-| `npm run test:auth`        | Auth feature specs         | Login and route-guard checks                       |
-| `npm run test:events`      | Events feature specs       | Discovery, search, and filtering checks            |
-| `npm run test:bookings`    | Booking feature specs      | Booking lifecycle and validation checks            |
-| `npm run test:admin`       | Admin feature specs        | Event management checks                            |
-| `npm run test:api`         | API feature specs          | API contract and support-client checks             |
-| `npm run test:hybrid`      | Hybrid feature specs       | API-created data verified through the UI           |
-| `npm run test:a11y`        | Accessibility specs        | Axe serious/critical accessibility smoke           |
-| `npm run test:visual`      | Visual smoke specs         | Captures baseline screenshots for core pages       |
-| `npm run test:qa:smoke`    | QA `@smoke` scenarios      | Explicit QA profile smoke run                      |
-| `npm run test:stage:smoke` | Stage `@smoke` scenarios   | Future stage profile smoke run                     |
-| `npm run test:prod-smoke`  | `@smoke and not @stateful` | Future production-safe smoke run                   |
-| `npm run report:html`      | Cucumber messages to HTML  | Generates `reports/cucumber/cucumber-report.html`  |
-| `npm run report:history`   | Report history summary     | Generates status, duration, and slowest-test data  |
-| `npm run report:combined`  | Combined CI report summary | Aggregates downloaded matrix report artifacts      |
-| `npm run report:dashboard` | Combined HTML dashboard    | Generates `reports/combined/index.html`            |
-| `npm run security:audit`   | Dependency audit           | Fails on critical npm advisories                   |
-| `npm run visual:compare`   | Visual comparison          | Compares screenshots to approved baselines         |
-| `npm run visual:approve`   | Visual baseline approval   | Promotes latest visual screenshots to baselines    |
+| Command                     | Scope                      | Typical use                                        |
+| --------------------------- | -------------------------- | -------------------------------------------------- |
+| `npm run cy:open`           | Interactive Cypress runner | Local debugging and authoring                      |
+| `npm run cy:run`            | All feature specs          | Full local execution                               |
+| `npm run doctor`            | Framework health checks    | Validates Node, Cypress, profile, credentials, API |
+| `npm run wait:app`          | UI reachability preflight  | Waits for configured `baseUrl` before Cypress      |
+| `npm run impact:list`       | Test impact analysis       | Maps changed files to impacted regression domains  |
+| `npm run test:smoke`        | `@smoke` scenarios         | Pull request and quick confidence run              |
+| `npm run test:regression`   | `@regression` scenarios    | Broader functional regression                      |
+| `npm run test:auth`         | Auth feature specs         | Login and route-guard checks                       |
+| `npm run test:events`       | Events feature specs       | Discovery, search, and filtering checks            |
+| `npm run test:bookings`     | Booking feature specs      | Booking lifecycle and validation checks            |
+| `npm run test:admin`        | Admin feature specs        | Event management checks                            |
+| `npm run test:api`          | API feature specs          | API contract and support-client checks             |
+| `npm run test:hybrid`       | Hybrid feature specs       | API-created data verified through the UI           |
+| `npm run test:a11y`         | Accessibility specs        | Axe serious/critical accessibility smoke           |
+| `npm run test:visual`       | Visual smoke specs         | Captures baseline screenshots for core pages       |
+| `npm run docker:build`      | Docker image build         | Builds the Cypress execution image                 |
+| `npm run docker:smoke`      | Docker smoke run           | Runs smoke tests in the container                  |
+| `npm run docker:regression` | Docker regression run      | Runs regression tests in the container             |
+| `npm run test:qa:smoke`     | QA `@smoke` scenarios      | Explicit QA profile smoke run                      |
+| `npm run test:stage:smoke`  | Stage `@smoke` scenarios   | Future stage profile smoke run                     |
+| `npm run test:prod-smoke`   | `@smoke and not @stateful` | Future production-safe smoke run                   |
+| `npm run report:html`       | Cucumber messages to HTML  | Generates `reports/cucumber/cucumber-report.html`  |
+| `npm run report:history`    | Report history summary     | Generates status, duration, and slowest-test data  |
+| `npm run report:combined`   | Combined CI report summary | Aggregates downloaded matrix report artifacts      |
+| `npm run report:dashboard`  | Combined HTML dashboard    | Generates `reports/combined/index.html`            |
+| `npm run security:audit`    | Dependency audit           | Fails on critical npm advisories                   |
+| `npm run visual:compare`    | Visual comparison          | Compares screenshots to approved baselines         |
+| `npm run visual:approve`    | Visual baseline approval   | Promotes latest visual screenshots to baselines    |
 
 Manual GitHub Actions runs expose dropdowns for suite, smoke browser, environment, and report
 publishing. The published dashboard URL is unique per workflow run attempt, for example
@@ -146,6 +149,7 @@ the `cypress-reports-combined` artifact reference.
 - Accessibility policy is documented in `docs/accessibility.md`.
 - CI matrix strategy is documented in `docs/ci-strategy.md`.
 - Dependency governance is documented in `docs/dependency-governance.md`.
+- Docker execution is documented in `docs/docker.md`.
 - Framework architecture is documented in `docs/framework-architecture.md`.
 - Published report dashboards are documented in `docs/report-dashboard.md`.
 - Contribution standards are documented in `docs/contributing.md`.
