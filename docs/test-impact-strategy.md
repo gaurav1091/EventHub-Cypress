@@ -39,5 +39,11 @@ Shared framework changes trigger a full regression recommendation:
 The `Impact Analysis` job publishes impacted domains and specs to the GitHub step summary and uploads
 `reports/impact/impact-summary.json`.
 
-The current CI still runs the reliable smoke and regression gates. Impact analysis is advisory until
-the project has enough trend history to safely skip non-impacted domains on pull requests.
+Smoke always runs as the fast confidence gate.
+
+On `pull_request` workflows, CI uses the impact output to run only impacted regression domains. Shared
+framework changes set `full_regression=true`, which runs every regression domain. When no regression
+domain is impacted, the regression matrix is skipped after smoke.
+
+On `push` to `main` and `workflow_dispatch`, CI keeps the full regression, accessibility, and visual
+suite enabled so the mainline signal remains complete.

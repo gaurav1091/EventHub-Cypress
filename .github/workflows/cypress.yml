@@ -76,6 +76,10 @@ jobs:
     needs: doctor
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      full_regression: ${{ steps.determine-impact.outputs.full_regression }}
+      domains: ${{ steps.determine-impact.outputs.domains }}
+      specs: ${{ steps.determine-impact.outputs.specs }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -93,6 +97,7 @@ jobs:
         run: npm ci
 
       - name: Determine impacted tests
+        id: determine-impact
         env:
           EVENTHUB_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           EVENTHUB_HEAD_SHA: ${{ github.sha }}
@@ -182,7 +187,10 @@ jobs:
 
   regression:
     name: Regression (${{ matrix.name }})
-    needs: smoke
+    needs:
+      - smoke
+      - impact
+    if: ${{ github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || needs.impact.outputs.domains != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -212,21 +220,23 @@ jobs:
         run: npm ci
 
       - name: Wait for EventHub UI
+        if: ${{ github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name)) }}
         run: npm run wait:app
 
       - name: Run regression suite
+        if: ${{ github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name)) }}
         run: EVENTHUB_TEST_DATA_NAMESPACE="ci-${{ github.run_id }}-regression-${{ matrix.name }}" env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@regression" --browser chrome --spec "${{ matrix.spec }}"
 
       - name: Generate Cucumber HTML report
-        if: always()
+        if: ${{ always() && (github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name))) }}
         run: npm run report:html
 
       - name: Generate report history summary
-        if: always()
+        if: ${{ always() && (github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name))) }}
         run: npm run report:history
 
       - name: Upload regression reports
-        if: always()
+        if: ${{ always() && (github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name))) }}
         uses: actions/upload-artifact@v4
         with:
           name: cypress-reports-regression-${{ matrix.name }}
@@ -237,7 +247,10 @@ jobs:
 
   accessibility:
     name: Accessibility
-    needs: smoke
+    needs:
+      - smoke
+      - impact
+    if: ${{ github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), ',accessibility,') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -281,8 +294,11 @@ jobs:
   visual:
     name: Visual Smoke
     needs:
+      - smoke
       - regression
       - accessibility
+      - impact
+    if: ${{ always() && needs.smoke.result == 'success' && (github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), ',visual,')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
