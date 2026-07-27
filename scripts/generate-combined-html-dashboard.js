@@ -289,6 +289,10 @@ function buildDashboard(summary, history) {
           Generated ${escapeHtml(summary.generatedAt)} for run
           ${escapeHtml(summary.run?.id || "local")} attempt ${escapeHtml(summary.run?.attempt || "n/a")}.
         </p>
+        <p>
+          Suite ${escapeHtml(summary.run?.suite || "auto")} on ${escapeHtml(summary.run?.browser || "matrix")}
+          for ${escapeHtml(summary.run?.environment || "qa")}.
+        </p>
       </header>
 
       <section class="metrics" aria-label="Run metrics">

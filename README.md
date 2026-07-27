@@ -47,6 +47,11 @@ EVENTHUB_USER_PASSWORD=your_password
 | `npm run visual:compare`   | Visual comparison          | Compares screenshots to approved baselines         |
 | `npm run visual:approve`   | Visual baseline approval   | Promotes latest visual screenshots to baselines    |
 
+Manual GitHub Actions runs expose dropdowns for suite, smoke browser, environment, and report
+publishing. The published dashboard URL is unique per workflow run attempt, for example
+`runs/<run_id>-<run_attempt>/`, so a manually selected suite does not show stale numbers from a
+different run.
+
 Current verified suites:
 
 - Smoke: 8 passing scenarios across Auth, Events, Bookings, Admin, and API.
@@ -126,7 +131,9 @@ scenario duration, previous-status metadata, and slowest-scenario details.
 In CI, the report-summary job also restores and updates `reports/combined/history.json` so combined
 run-level trends can persist across workflow runs on the same branch. The same job generates
 `reports/combined/index.html`, a static dashboard for reviewing job totals, failures, slowest
-scenarios, and recent run history from the uploaded combined artifact.
+scenarios, and recent run history from the uploaded combined artifact. On trusted `main` runs, CI also
+publishes that dashboard through GitHub Pages when Pages is configured for GitHub Actions. Published
+dashboards are stored under unique run-attempt paths and copied to `latest/`.
 
 ## Enterprise Conventions
 
@@ -137,6 +144,7 @@ scenarios, and recent run history from the uploaded combined artifact.
 - CI matrix strategy is documented in `docs/ci-strategy.md`.
 - Dependency governance is documented in `docs/dependency-governance.md`.
 - Framework architecture is documented in `docs/framework-architecture.md`.
+- Published report dashboards are documented in `docs/report-dashboard.md`.
 - Contribution standards are documented in `docs/contributing.md`.
 - BDD authoring standards are documented in `docs/test-authoring-guide.md`.
 - Tagging standards are documented in `docs/tagging-strategy.md`.

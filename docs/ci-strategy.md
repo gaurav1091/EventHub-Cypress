@@ -30,6 +30,7 @@ The workflow uses separate jobs:
 - `accessibility`
 - `visual`
 - `report-summary`
+- `deploy-report-dashboard`
 
 ## Cypress Matrix Legs
 
@@ -58,6 +59,14 @@ easier run-level review. It also generates `reports/combined/combined-summary.js
 scenario totals and slowest scenarios across all downloaded matrix artifacts. It then generates
 `reports/combined/index.html`, a static dashboard that gives reviewers a faster human-readable view of
 the same combined data.
+
+On trusted `main` runs, `report-summary` uploads `reports/combined` as a GitHub Pages artifact and
+`deploy-report-dashboard` publishes it. Pull request runs do not deploy pages; they only upload the
+combined artifact for review inside the workflow run.
+
+Manual `workflow_dispatch` runs expose suite, smoke browser, environment, and publish-report choices.
+Published dashboards are written to `runs/<run_id>-<run_attempt>/` and copied to `latest/`, so a
+manual report link preserves the exact run attempt that produced its totals.
 
 The report-summary job restores `reports/combined/history.json` from the branch-level GitHub Actions
 cache before generating the combined summary. `scripts/generate-combined-report-summary.js` appends the

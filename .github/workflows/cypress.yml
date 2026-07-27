@@ -2,16 +2,71 @@ name: Cypress BDD Tests
 
 on:
   workflow_dispatch:
+    inputs:
+      suite:
+        description: Test suite to run
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - smoke
+          - regression
+          - auth-events
+          - bookings
+          - admin
+          - api-hybrid
+          - accessibility
+          - visual
+      smoke_browser:
+        description: Browser for smoke suite
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - chrome
+          - electron
+      environment:
+        description: Target environment profile
+        required: true
+        default: qa
+        type: choice
+        options:
+          - qa
+          - stage
+          - prod-smoke
+      publish_report:
+        description: Publish dashboard to GitHub Pages
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
   pull_request:
   push:
     branches:
       - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: eventhub-cypress-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 env:
   EVENTHUB_BASE_URL: ${{ secrets.EVENTHUB_BASE_URL }}
   EVENTHUB_API_BASE_URL: ${{ secrets.EVENTHUB_API_BASE_URL }}
   EVENTHUB_USER_EMAIL: ${{ secrets.EVENTHUB_USER_EMAIL }}
   EVENTHUB_USER_PASSWORD: ${{ secrets.EVENTHUB_USER_PASSWORD }}
+  EVENTHUB_ENV: ${{ inputs.environment || 'qa' }}
+  EVENTHUB_RUN_SUITE: ${{ inputs.suite || 'auto' }}
+  EVENTHUB_RUN_BROWSER: ${{ inputs.smoke_browser || 'matrix' }}
+  EVENTHUB_REPORT_PATH: runs/${{ github.run_id }}-${{ github.run_attempt }}
 
 jobs:
   doctor:
@@ -133,6 +188,7 @@ jobs:
 
   smoke:
     name: Smoke (${{ matrix.name }})
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.suite == 'all' || inputs.suite == 'smoke' }}
     needs:
       - lint
       - impact
@@ -162,21 +218,23 @@ jobs:
         run: npm ci
 
       - name: Wait for EventHub UI
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.smoke_browser == 'all' || inputs.smoke_browser == matrix.name }}
         run: npm run wait:app
 
       - name: Run smoke suite
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.smoke_browser == 'all' || inputs.smoke_browser == matrix.name }}
         run: EVENTHUB_TEST_DATA_NAMESPACE="ci-${{ github.run_id }}-smoke-${{ matrix.name }}" env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@smoke" --browser "${{ matrix.browser }}"
 
       - name: Generate Cucumber HTML report
-        if: always()
+        if: ${{ always() && (github.event_name != 'workflow_dispatch' || inputs.smoke_browser == 'all' || inputs.smoke_browser == matrix.name) }}
         run: npm run report:html
 
       - name: Generate report history summary
-        if: always()
+        if: ${{ always() && (github.event_name != 'workflow_dispatch' || inputs.smoke_browser == 'all' || inputs.smoke_browser == matrix.name) }}
         run: npm run report:history
 
       - name: Upload smoke reports
-        if: always()
+        if: ${{ always() && (github.event_name != 'workflow_dispatch' || inputs.smoke_browser == 'all' || inputs.smoke_browser == matrix.name) }}
         uses: actions/upload-artifact@v4
         with:
           name: cypress-reports-smoke-${{ matrix.name }}
@@ -190,7 +248,7 @@ jobs:
     needs:
       - smoke
       - impact
-    if: ${{ github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || needs.impact.outputs.domains != '' }}
+    if: ${{ always() && (github.event_name == 'workflow_dispatch' && (inputs.suite == 'all' || inputs.suite == 'regression' || inputs.suite == 'auth-events' || inputs.suite == 'bookings' || inputs.suite == 'admin' || inputs.suite == 'api-hybrid') || github.event_name == 'push' || github.event_name == 'pull_request' && (needs.impact.outputs.full_regression == 'true' || needs.impact.outputs.domains != '')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -220,23 +278,23 @@ jobs:
         run: npm ci
 
       - name: Wait for EventHub UI
-        if: ${{ github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name)) }}
+        if: ${{ github.event_name == 'workflow_dispatch' && (inputs.suite == 'all' || inputs.suite == 'regression' || inputs.suite == matrix.name) || github.event_name == 'push' || github.event_name == 'pull_request' && (needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name))) }}
         run: npm run wait:app
 
       - name: Run regression suite
-        if: ${{ github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name)) }}
+        if: ${{ github.event_name == 'workflow_dispatch' && (inputs.suite == 'all' || inputs.suite == 'regression' || inputs.suite == matrix.name) || github.event_name == 'push' || github.event_name == 'pull_request' && (needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name))) }}
         run: EVENTHUB_TEST_DATA_NAMESPACE="ci-${{ github.run_id }}-regression-${{ matrix.name }}" env -u ELECTRON_RUN_AS_NODE npx cypress run --env tags="@regression" --browser chrome --spec "${{ matrix.spec }}"
 
       - name: Generate Cucumber HTML report
-        if: ${{ always() && (github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name))) }}
+        if: ${{ always() && (github.event_name == 'workflow_dispatch' && (inputs.suite == 'all' || inputs.suite == 'regression' || inputs.suite == matrix.name) || github.event_name == 'push' || github.event_name == 'pull_request' && (needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name)))) }}
         run: npm run report:html
 
       - name: Generate report history summary
-        if: ${{ always() && (github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name))) }}
+        if: ${{ always() && (github.event_name == 'workflow_dispatch' && (inputs.suite == 'all' || inputs.suite == 'regression' || inputs.suite == matrix.name) || github.event_name == 'push' || github.event_name == 'pull_request' && (needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name)))) }}
         run: npm run report:history
 
       - name: Upload regression reports
-        if: ${{ always() && (github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name))) }}
+        if: ${{ always() && (github.event_name == 'workflow_dispatch' && (inputs.suite == 'all' || inputs.suite == 'regression' || inputs.suite == matrix.name) || github.event_name == 'push' || github.event_name == 'pull_request' && (needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name)))) }}
         uses: actions/upload-artifact@v4
         with:
           name: cypress-reports-regression-${{ matrix.name }}
@@ -250,7 +308,7 @@ jobs:
     needs:
       - smoke
       - impact
-    if: ${{ github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), ',accessibility,') }}
+    if: ${{ always() && (github.event_name == 'workflow_dispatch' && (inputs.suite == 'all' || inputs.suite == 'accessibility') || github.event_name == 'push' || github.event_name == 'pull_request' && (needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), ',accessibility,'))) }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -298,7 +356,7 @@ jobs:
       - regression
       - accessibility
       - impact
-    if: ${{ always() && needs.smoke.result == 'success' && (github.event_name != 'pull_request' || needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), ',visual,')) }}
+    if: ${{ always() && (needs.smoke.result == 'success' || needs.smoke.result == 'skipped') && (github.event_name == 'workflow_dispatch' && (inputs.suite == 'all' || inputs.suite == 'visual') || github.event_name == 'push' || github.event_name == 'pull_request' && (needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), ',visual,'))) }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -410,3 +468,82 @@ jobs:
           path: |
             combined-artifacts
             reports/combined
+
+      - name: Restore published dashboard site
+        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        uses: actions/cache/restore@v4
+        with:
+          path: site
+          key: eventhub-dashboard-site-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            eventhub-dashboard-site-
+
+      - name: Prepare GitHub Pages site
+        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        run: |
+          set -euo pipefail
+          report_path="${EVENTHUB_REPORT_PATH}"
+
+          mkdir -p "site/$report_path" site/latest
+          cp -R reports/combined/. "site/$report_path/"
+          cp -R reports/combined/. site/latest/
+
+          cat > site/index.html <<EOF
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8">
+              <meta http-equiv="refresh" content="0; url=$report_path/">
+              <title>EventHub Cypress Report</title>
+            </head>
+            <body>
+              <p><a href="$report_path/">Open this run's Cypress report</a></p>
+              <p><a href="latest/">Open latest Cypress report</a></p>
+            </body>
+          </html>
+          EOF
+
+      - name: Save published dashboard site
+        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        uses: actions/cache/save@v4
+        with:
+          path: site
+          key: eventhub-dashboard-site-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Configure GitHub Pages
+        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && (github.event_name != 'workflow_dispatch' || inputs.publish_report == 'true') }}
+        uses: actions/configure-pages@v5
+
+      - name: Upload dashboard for GitHub Pages
+        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && (github.event_name != 'workflow_dispatch' || inputs.publish_report == 'true') }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy-report-dashboard:
+    name: Deploy Report Dashboard
+    needs: report-summary
+    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && needs.report-summary.result == 'success' && (github.event_name != 'workflow_dispatch' || inputs.publish_report == 'true') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.report-url.outputs.url }}
+    steps:
+      - name: Deploy dashboard to GitHub Pages
+        id: deploy-pages
+        uses: actions/deploy-pages@v4
+
+      - name: Set run-specific report URL
+        id: report-url
+        run: echo "url=${{ steps.deploy-pages.outputs.page_url }}${EVENTHUB_REPORT_PATH}/" >> "$GITHUB_OUTPUT"
+
+      - name: Add dashboard links to workflow summary
+        run: |
+          echo "### Cypress Report Dashboard" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "[Open this run's Cypress report](${{ steps.report-url.outputs.url }})" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "[Open latest Cypress report](${{ steps.deploy-pages.outputs.page_url }}latest/)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Report path: \`${EVENTHUB_REPORT_PATH}/\`" >> "$GITHUB_STEP_SUMMARY"
