@@ -166,7 +166,7 @@ jobs:
         run: npm run impact:list
 
       - name: Upload impact report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cypress-impact-analysis
           path: reports/impact
@@ -219,7 +219,7 @@ jobs:
 
       - name: Upload Docker smoke reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cypress-reports-docker-smoke
           path: |
@@ -277,7 +277,7 @@ jobs:
 
       - name: Upload smoke reports
         if: ${{ always() && (github.event_name != 'workflow_dispatch' || inputs.smoke_browser == 'all' || inputs.smoke_browser == matrix.name) }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cypress-reports-smoke-${{ matrix.name }}
           path: |
@@ -337,7 +337,7 @@ jobs:
 
       - name: Upload regression reports
         if: ${{ always() && (github.event_name == 'workflow_dispatch' && (inputs.suite == 'all' || inputs.suite == 'regression' || inputs.suite == matrix.name) || github.event_name == 'push' || github.event_name == 'pull_request' && (needs.impact.outputs.full_regression == 'true' || contains(format(',{0},', needs.impact.outputs.domains), format(',{0},', matrix.name)))) }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cypress-reports-regression-${{ matrix.name }}
           path: |
@@ -383,7 +383,7 @@ jobs:
 
       - name: Upload accessibility reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cypress-reports-accessibility
           path: |
@@ -445,7 +445,7 @@ jobs:
 
       - name: Upload visual reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cypress-reports-visual
           path: |
@@ -546,7 +546,7 @@ jobs:
             }
 
       - name: Upload combined report bundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cypress-reports-combined
           path: |
