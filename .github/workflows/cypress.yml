@@ -44,6 +44,9 @@ on:
         options:
           - "true"
           - "false"
+  schedule:
+    # Runs every Sunday at 10:00 AM IST. GitHub Actions cron uses UTC.
+    - cron: "30 4 * * 0"
   pull_request:
   push:
     branches:
