@@ -20,3 +20,10 @@ Feature: Visual smoke baselines
     Given I am signed in to EventHub
     When I capture the Booking Confirmation visual baseline for "Dilli Diwali Mela"
     Then the booking confirmation visual baseline should be captured
+
+  @visual
+  Scenario: Validation and error states render stable visual baselines
+    When I capture the Login error visual baseline
+    And I capture the Booking validation visual baseline for "Dilli Diwali Mela"
+    And I capture the Admin validation visual baseline
+    Then the validation visual baselines should be captured

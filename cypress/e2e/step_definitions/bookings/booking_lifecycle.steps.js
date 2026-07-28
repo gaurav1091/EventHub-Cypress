@@ -3,7 +3,11 @@ import EventsPage from "../../../support/pages/EventsPage";
 import EventDetailPage from "../../../support/pages/EventDetailPage";
 import BookingsPage from "../../../support/pages/BookingsPage";
 import EventHubClient from "../../../support/api/EventHubClient";
-import { apiBookingPayload, bookingCustomer } from "../../../support/data/TestDataFactory";
+import {
+  apiBookingPayload,
+  bookingCustomer,
+  eventPayload,
+} from "../../../support/data/TestDataFactory";
 
 const eventsPage = new EventsPage();
 const eventDetailPage = new EventDetailPage();
@@ -11,6 +15,7 @@ const bookingsPage = new BookingsPage();
 const eventHubClient = new EventHubClient();
 
 let currentCustomer;
+let currentEvent;
 
 When("I book {int} ticket for event {string}", (quantity, eventName) => {
   currentCustomer = bookingCustomer();
@@ -138,4 +143,43 @@ When("I clean Cypress-created bookings through the API", () => {
 Then("no Cypress-created bookings should remain in My Bookings", () => {
   bookingsPage.visit();
   bookingsPage.assertEmptyOrNoCypressBookings();
+});
+
+When("I create a one-seat admin event through the API", () => {
+  currentEvent = eventPayload({
+    title: `Cypress Sold Out Event ${Date.now()}`,
+    totalSeats: "1",
+    price: "199",
+  });
+
+  eventHubClient.login().then(() => {
+    eventHubClient.createEvent(currentEvent).then((response) => {
+      expect(response.status).to.be.oneOf([200, 201]);
+      currentEvent = {
+        ...currentEvent,
+        ...response.body.data,
+      };
+    });
+  });
+});
+
+When("I book {int} ticket for the created admin event", (quantity) => {
+  currentCustomer = bookingCustomer();
+
+  eventsPage.visit();
+  eventsPage.bookEvent(currentEvent.title);
+  eventDetailPage.assertLoaded(currentEvent.title);
+
+  if (quantity > 1) {
+    eventDetailPage.increaseTickets(quantity - 1);
+  }
+
+  eventDetailPage.fillBookingForm(currentCustomer);
+  eventDetailPage.confirmBooking();
+  eventDetailPage.assertBookingConfirmed(currentCustomer);
+});
+
+Then("the created admin event should show no remaining seats or be unavailable for booking", () => {
+  eventsPage.search(currentEvent.title);
+  eventsPage.assertEventSoldOutOrUnavailable(currentEvent.title);
 });

@@ -78,6 +78,23 @@ export default class EventsPage {
     cy.contains("article", eventName).should("not.exist");
   }
 
+  assertEventSoldOutOrUnavailable(eventName) {
+    cy.contains("article", eventName).then(($article) => {
+      const text = $article.text();
+      const bookButton = [...$article.find("button")].find((button) =>
+        /book now/i.test(button.innerText),
+      );
+
+      const showsNoSeats = /(sold out|0\s+seats|no\s+seats|unavailable)/i.test(text);
+      const cannotBook = !bookButton || bookButton.disabled === true;
+
+      expect(
+        showsNoSeats || cannotBook,
+        `Expected ${eventName} to show a sold-out state or disable booking.`,
+      ).to.eq(true);
+    });
+  }
+
   assertNoEventsFound() {
     cy.contains("No events found").should("be.visible");
   }

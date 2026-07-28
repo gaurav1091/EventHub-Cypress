@@ -79,3 +79,10 @@ Feature: Event booking lifecycle
     When I create a booking through the API for cleanup
     And I clean Cypress-created bookings through the API
     Then no Cypress-created bookings should remain in My Bookings
+
+  @regression @stateful
+  Scenario: Sold-out event cannot be booked again
+    When I create a one-seat admin event through the API
+    And I book 1 ticket for the created admin event
+    And I open the Events page
+    Then the created admin event should show no remaining seats or be unavailable for booking
