@@ -46,11 +46,11 @@
     "format:check": "prettier --check ."
   },
   "devDependencies": {
-    "@badeball/cypress-cucumber-preprocessor": "^26.0.0",
+    "@badeball/cypress-cucumber-preprocessor": "^27.0.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
     "ajv": "^8.20.0",
     "axe-core": "^4.12.1",
-    "cypress": "14.5.4",
+    "cypress": "15.21.1",
     "cypress-axe": "^1.7.0",
     "dotenv": "^17.4.2",
     "esbuild": "^0.28.1",
