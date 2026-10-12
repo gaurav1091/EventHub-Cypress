@@ -49,16 +49,16 @@
     "@badeball/cypress-cucumber-preprocessor": "^26.0.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
     "ajv": "^8.20.0",
-    "axe-core": "^4.12.1",
+    "axe-core": "^4.14.0",
     "cypress": "14.5.4",
     "cypress-axe": "^1.7.0",
     "dotenv": "^17.4.2",
     "esbuild": "^0.28.1",
-    "eslint": "^10.7.0",
-    "eslint-plugin-cypress": "^6.4.3",
-    "pixelmatch": "^7.2.0",
+    "eslint": "^10.12.0",
+    "eslint-plugin-cypress": "^7.0.2",
+    "pixelmatch": "^8.0.0",
     "pngjs": "^7.0.0",
-    "prettier": "^3.9.6"
+    "prettier": "^3.9.9"
   },
   "overrides": {
     "diff": "^8.0.2",
